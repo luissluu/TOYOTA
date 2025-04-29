@@ -1,11 +1,15 @@
 const express = require('express');
 const router = express.Router();
 const vehiculoController = require('../controllers/vehiculoController');
+const { authMiddleware, checkRole } = require('../middlewares/authMiddleware');
 
-router.get('/', vehiculoController.getAll);
-router.get('/:id', vehiculoController.getById);
-router.post('/', vehiculoController.create);
-router.put('/:id', vehiculoController.update);
-router.delete('/:id', vehiculoController.delete);
+// Rutas protegidas con autenticación
+router.get('/', authMiddleware, vehiculoController.getAll);
+router.get('/:id', authMiddleware, vehiculoController.getById);
+
+// Rutas protegidas con autenticación y verificación de roles
+router.post('/', authMiddleware, checkRole(['administrador', 'mecanico', 'cliente']), vehiculoController.create);
+router.put('/:id', authMiddleware, checkRole(['administrador', 'mecanico']), vehiculoController.update);
+router.delete('/:id', authMiddleware, checkRole(['administrador']), vehiculoController.delete);
 
 module.exports = router;
