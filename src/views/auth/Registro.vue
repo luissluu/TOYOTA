@@ -1,3 +1,4 @@
+<!-- src/views/auth/Registro.vue -->
 <template>
   <div class="min-h-screen bg-gray-800 flex flex-col items-center justify-center px-4 py-12">
     <div 
@@ -41,99 +42,103 @@
               </h3>
               
               <!-- Formulario -->
-              <form @submit.prevent="handleRegister" class="space-y-6">
+              <form @submit.prevent="enviarFormulario(handleRegister)" class="space-y-6">
                 <!-- Nombre -->
-                <div>
-                  <label for="name" class="block text-sm font-medium text-gray-700 mb-1">
-                    Nombre Completo
-                  </label>
-                  <div class="relative">
-                    <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-gray-500">
-                      <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
-                        <path fill-rule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clip-rule="evenodd" />
-                      </svg>
-                    </div>
-                    <input
-                      id="name"
-                      v-model="name"
-                      type="text"
-                      placeholder="Tu nombre completo"
-                      class="w-full rounded-md border border-gray-300 pl-10 pr-4 py-2 text-gray-900 placeholder-gray-500 focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
-                      required
-                    />
-                  </div>
-                </div>
+                <CampoValidado
+                  id="nombre"
+                  v-model="formulario.nombre"
+                  :error="errores.nombre"
+                  @update:error="errores.nombre = $event"
+                  @validacion="validacionCampo('nombre', $event)"
+                  @blur="alPerderFoco('nombre')"
+                  label="Nombre Completo"
+                  placeholder="Tu nombre completo"
+                  required
+                  soloLetras
+                  :validator="validarNombre"
+                  errorMessage="Por favor ingresa un nombre válido (solo letras)"
+                >
+                  <template #icono>
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                      <path fill-rule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clip-rule="evenodd" />
+                    </svg>
+                  </template>
+                </CampoValidado>
 
-                <!-- Campo de correo -->
-                <div>
-                  <label for="email" class="block text-sm font-medium text-gray-700 mb-1">
-                    Correo Electrónico
-                  </label>
-                  <div class="relative">
-                    <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-gray-500">
-                      <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
-                        <path d="M2.003 5.884L10 9.882l7.997-3.998A2 2 0 0016 4H4a2 2 0 00-1.997 1.884z" />
-                        <path d="M18 8.118l-8 4-8-4V14a2 2 0 002 2h12a2 2 0 002-2V8.118z" />
-                      </svg>
-                    </div>
-                    <input
-                      id="email"
-                      v-model="email"
-                      type="email"
-                      placeholder="correo@ejemplo.com"
-                      class="w-full rounded-md border border-gray-300 pl-10 pr-4 py-2 text-gray-900 placeholder-gray-500 focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
-                      required
-                    />
-                  </div>
-                </div>
+                <!-- Correo -->
+                <CampoValidado
+                  id="email"
+                  type="email"
+                  v-model="formulario.email"
+                  :error="errores.email"
+                  @update:error="errores.email = $event"
+                  @validacion="validacionCampo('email', $event)"
+                  @blur="alPerderFoco('email')"
+                  label="Correo Electrónico"
+                  placeholder="correo@ejemplo.com"
+                  required
+                  :validator="validarEmail"
+                  errorMessage="Por favor ingresa un correo electrónico válido"
+                  autocomplete="email"
+                >
+                  <template #icono>
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                      <path d="M2.003 5.884L10 9.882l7.997-3.998A2 2 0 0016 4H4a2 2 0 00-1.997 1.884z" />
+                      <path d="M18 8.118l-8 4-8-4V14a2 2 0 002 2h12a2 2 0 002-2V8.118z" />
+                    </svg>
+                  </template>
+                </CampoValidado>
 
-                <!-- Campo de contraseña -->
-                <div>
-                  <label for="password" class="block text-sm font-medium text-gray-700 mb-1">
-                    Contraseña
-                  </label>
-                  <div class="relative">
-                    <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-gray-500">
-                      <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
-                        <path fill-rule="evenodd" d="M5 9V7a5 5 0 0110 0v2a2 2 0 012 2v5a2 2 0 01-2 2H5a2 2 0 01-2-2v-5a2 2 0 012-2zm8-2v2H7V7a3 3 0 016 0z" clip-rule="evenodd" />
-                      </svg>
-                    </div>
-                    <input
-                      id="password"
-                      v-model="password"
-                      type="password"
-                      placeholder="••••••••"
-                      class="w-full rounded-md border border-gray-300 pl-10 pr-4 py-2 text-gray-900 placeholder-gray-500 focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
-                      required
-                    />
-                  </div>
-                </div>
+                <!-- Contraseña -->
+                <CampoValidado
+                  id="password"
+                  type="password"
+                  v-model="formulario.password"
+                  :error="errores.password"
+                  @update:error="errores.password = $event"
+                  @validacion="validacionCampo('password', $event)"
+                  @blur="alPerderFoco('password')"
+                  label="Contraseña"
+                  placeholder="••••••••"
+                  required
+                  :validator="validarPassword"
+                  errorMessage="Debe tener al menos 8 caracteres, incluyendo mayúscula, minúscula y un número"
+                  autocomplete="new-password"
+                  ayuda="Mínimo 8 caracteres, una mayúscula, una minúscula y un número"
+                >
+                  <template #icono>
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                      <path fill-rule="evenodd" d="M5 9V7a5 5 0 0110 0v2a2 2 0 012 2v5a2 2 0 01-2 2H5a2 2 0 01-2-2v-5a2 2 0 012-2zm8-2v2H7V7a3 3 0 016 0z" clip-rule="evenodd" />
+                    </svg>
+                  </template>
+                </CampoValidado>
 
-                <!-- Confirmar contraseña -->
-                <div>
-                  <label for="passwordConfirm" class="block text-sm font-medium text-gray-700 mb-1">
-                    Confirmar Contraseña
-                  </label>
-                  <div class="relative">
-                    <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-gray-500">
-                      <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
-                        <path fill-rule="evenodd" d="M5 9V7a5 5 0 0110 0v2a2 2 0 012 2v5a2 2 0 01-2 2H5a2 2 0 01-2-2v-5a2 2 0 012-2zm8-2v2H7V7a3 3 0 016 0z" clip-rule="evenodd" />
-                      </svg>
-                    </div>
-                    <input
-                      id="passwordConfirm"
-                      v-model="passwordConfirm"
-                      type="password"
-                      placeholder="••••••••"
-                      class="w-full rounded-md border border-gray-300 pl-10 pr-4 py-2 text-gray-900 placeholder-gray-500 focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
-                      required
-                    />
-                  </div>
-                </div>
+                <!-- Confirmar Contraseña -->
+                <CampoValidado
+                  id="passwordConfirm"
+                  type="password"
+                  v-model="formulario.passwordConfirm"
+                  :error="errores.passwordConfirm"
+                  @update:error="errores.passwordConfirm = $event"
+                  @validacion="validacionCampo('passwordConfirm', $event)"
+                  @blur="alPerderFoco('passwordConfirm')"
+                  label="Confirmar Contraseña"
+                  placeholder="••••••••"
+                  required
+                  :validator="(valor) => validarConfirmacionPassword(valor, formulario.password)"
+                  errorMessage="Las contraseñas no coinciden"
+                  autocomplete="new-password"
+                >
+                  <template #icono>
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                      <path fill-rule="evenodd" d="M5 9V7a5 5 0 0110 0v2a2 2 0 012 2v5a2 2 0 01-2 2H5a2 2 0 01-2-2v-5a2 2 0 012-2zm8-2v2H7V7a3 3 0 016 0z" clip-rule="evenodd" />
+                    </svg>
+                  </template>
+                </CampoValidado>
 
-                <!-- Mensaje de error -->
-                <div v-if="error" class="bg-red-50 text-red-600 p-3 rounded-md text-sm">
-                  {{ error }}
+                <!-- Mensaje de error global -->
+                <div v-if="errorGlobal" class="bg-red-50 text-red-600 p-3 rounded-md text-sm">
+                  {{ errorGlobal }}
                 </div>
 
                 <!-- Botón de registro -->
@@ -141,13 +146,13 @@
                   <button
                     type="submit"
                     class="w-full flex justify-center items-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-700 hover:bg-blue-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
-                    :disabled="loading"
+                    :disabled="cargando || !formularioValido"
                   >
-                    <svg v-if="loading" class="animate-spin -ml-1 mr-2 h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                    <svg v-if="cargando" class="animate-spin -ml-1 mr-2 h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
                       <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
                       <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
                     </svg>
-                    {{ loading ? 'Creando cuenta...' : 'Registrarse' }}
+                    {{ cargando ? 'Creando cuenta...' : 'Registrarse' }}
                   </button>
                 </div>
 
@@ -177,52 +182,120 @@
   </div>
 </template>
 
-<script>
-export default {
-  name: 'RegistroView',
-  data() {
-    return {
-      name: '',
-      email: '',
-      password: '',
-      passwordConfirm: '',
-      loading: false,
-      error: ''
+<script setup>
+import { ref, computed, watch } from 'vue';
+import { useRouter } from 'vue-router';
+import CampoValidado from '../../components/ui/CampoValidado.vue';
+import { validarSoloLetras, validarEmail, validarPassword, validarPasswordsCoinciden } from '../../utils/validaciones';
+import { useFormulario } from '../../composables/useFormulario';
+
+const router = useRouter();
+
+// Esquema de validación del formulario
+const esquemaValidacion = {
+  nombre: {
+    requerido: true,
+    validador: validarSoloLetras,
+    validarInmediato: true,
+    mensajes: {
+      requerido: 'El nombre es obligatorio',
+      validador: 'Por favor ingresa un nombre válido (solo letras)'
     }
   },
-  methods: {
-    handleRegister() {
-      // Validación básica
-      if (this.password !== this.passwordConfirm) {
-        this.error = 'Las contraseñas no coinciden';
-        return;
-      }
-      
-      if (this.password.length < 6) {
-        this.error = 'La contraseña debe tener al menos 6 caracteres';
-        return;
-      }
-
-      this.loading = true;
-      this.error = '';
-      
-      // Simulamos un proceso de registro
-      setTimeout(() => {
-        // Aquí iría la llamada real a la API de registro
-        
-        // Simulamos un registro exitoso
-        localStorage.setItem('auth_token', 'ejemplo-token-' + Math.random().toString(36).substring(2));
-        localStorage.setItem('user', JSON.stringify({
-          name: this.name,
-          email: this.email
-        }));
-        
-        // Redirigir al dashboard o página principal
-        this.$router.push('/');
-        
-        this.loading = false;
-      }, 1500);
+  email: {
+    requerido: true,
+    validador: validarEmail,
+    mensajes: {
+      requerido: 'El correo electrónico es obligatorio',
+      validador: 'Por favor ingresa un correo electrónico válido'
+    }
+  },
+  password: {
+    requerido: true,
+    validador: validarPassword,
+    mensajes: {
+      requerido: 'La contraseña es obligatoria',
+      validador: 'Debe tener al menos 8 caracteres, incluyendo mayúscula, minúscula y un número'
+    }
+  },
+  passwordConfirm: {
+    requerido: true,
+    validador: (valor, form) => validarPasswordsCoinciden(valor, form.password),
+    mensajes: {
+      requerido: 'Por favor, confirma tu contraseña',
+      validador: 'Las contraseñas no coinciden'
     }
   }
-}
+};
+
+// Valores iniciales del formulario
+const valoresIniciales = {
+  nombre: '',
+  email: '',
+  password: '',
+  passwordConfirm: ''
+};
+
+// Usar el hook de formulario
+const {
+  formulario,
+  errores,
+  cargando,
+  exito,
+  errorGlobal,
+  formularioValido,
+  validarCampo,
+  validarFormulario,
+  alPerderFoco,
+  resetearFormulario,
+  enviarFormulario
+} = useFormulario(esquemaValidacion, valoresIniciales);
+
+// Funciones de validación adicionales para usar en los componentes
+const validarNombre = (valor) => {
+  return validarSoloLetras(valor);
+};
+
+const validarConfirmacionPassword = (confirmacion, original) => {
+  return validarPasswordsCoinciden(confirmacion, original);
+};
+
+// Función para manejar la validación de un campo
+const validacionCampo = (campo, esValido) => {
+  // Puedes hacer algo adicional aquí si es necesario
+  console.log(`Campo ${campo} validado: ${esValido}`);
+};
+
+// Función para manejar el registro
+const handleRegister = async () => {
+  try {
+    // Simular llamada a API (en un entorno real, esto sería una petición a tu backend)
+    await new Promise(resolve => setTimeout(resolve, 1500));
+    
+    // Simular registro exitoso
+    localStorage.setItem('auth_token', 'ejemplo-token-' + Math.random().toString(36).substring(2));
+    localStorage.setItem('user', JSON.stringify({
+      name: formulario.nombre,
+      email: formulario.email
+    }));
+    
+    // Redirigir al dashboard o página principal
+    router.push('/');
+    
+    return true;
+  } catch (error) {
+    throw new Error('Ha ocurrido un error al registrarse. Por favor, intenta más tarde.');
+  }
+};
+
+// Observar cambios importantes en el formulario
+watch(
+  [() => formulario.password, () => formulario.passwordConfirm],
+  ([nuevaPassword, nuevaConfirmacion]) => {
+    // Si tenemos ambos valores, validamos la confirmación
+    if (nuevaPassword && nuevaConfirmacion) {
+      validarCampo('passwordConfirm');
+    }
+  }
+);
 </script>

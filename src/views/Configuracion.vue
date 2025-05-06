@@ -1,4 +1,6 @@
+import FormularioVehiculo from '../components/configuracion/FormularioVehiculo.vue';
 <template>
+  
   <div class="flex flex-col w-full px-6">
     <section class="grid grid-cols-1 gap-8 px-8 md:grid-cols-2">
       <div class="bg-gray-800 md:col-span-2">
@@ -48,44 +50,67 @@
               
               <!-- Sección 2: Vehículos -->
               <div class="mb-8">
-                <h3 class="text-xl font-semibold text-white border-b border-gray-600 pb-2 mb-4">Mis Vehículos</h3>
-                <div class="bg-gray-700 rounded-lg p-6">
-                  <div class="mb-6">
-                    <div class="flex justify-between items-center mb-4">
-                      <h4 class="text-lg font-medium text-white">Vehículos Registrados</h4>
-                      <button class="px-3 py-1 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition">+ Añadir Vehículo</button>
-                    </div>
-                    
-                    <!-- Lista de vehículos -->
-                    <div class="space-y-4">
-                      <!-- Vehículo 1 -->
-                      <div class="bg-gray-800 rounded-lg p-4 flex flex-col md:flex-row justify-between items-start md:items-center">
-                        <div>
-                          <h5 class="text-white font-medium">Honda Civic 2020</h5>
-                          <p class="text-gray-400 text-sm">VIN: 123</p>
-                        </div>
-                        <div class="flex mt-2 md:mt-0">
-                          <button class="text-white bg-blue-600 hover:bg-blue-700 px-3 py-1 rounded-md mr-2">Editar</button>
-                          <button class="text-white bg-red-600 hover:bg-red-700 px-3 py-1 rounded-md">Eliminar</button>
-                        </div>
-                      </div>
-                      
-                      <!-- Vehículo 2 -->
-                      <div class="bg-gray-800 rounded-lg p-4 flex flex-col md:flex-row justify-between items-start md:items-center">
-                        <div>
-                          <h5 class="text-white font-medium">Toyota Corolla 2019</h5>
-                          <p class="text-gray-400 text-sm">VIN: 789</p>
-                        </div>
-                        <div class="flex mt-2 md:mt-0">
-                          <button class="text-white bg-blue-600 hover:bg-blue-700 px-3 py-1 rounded-md mr-2">Editar</button>
-                          <button class="text-white bg-red-600 hover:bg-red-700 px-3 py-1 rounded-md">Eliminar</button>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-              
+  <h3 class="text-xl font-semibold text-white border-b border-gray-600 pb-2 mb-4">Mis Vehículos</h3>
+  
+  <!-- Lista de vehículos existentes -->
+  <div class="bg-gray-700 rounded-lg p-6 mb-4">
+    <div class="flex justify-between items-center mb-4">
+      <h4 class="text-lg font-medium text-white">Vehículos Registrados</h4>
+      <button 
+        @click="mostrarFormulario = true; modoFormulario = 'agregar'"
+        class="px-3 py-1 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition"
+      >
+        + Añadir Vehículo
+      </button>
+    </div>
+    
+    <!-- Lista de vehículos -->
+    <div class="space-y-4">
+      <div 
+        v-for="vehiculo in vehiculos" 
+        :key="vehiculo.id" 
+        class="bg-gray-800 rounded-lg p-4 flex flex-col md:flex-row justify-between items-start md:items-center"
+      >
+        <div>
+          <h5 class="text-white font-medium">{{ vehiculo.marca }} {{ vehiculo.modelo }} {{ vehiculo.ano }}</h5>
+          <p class="text-gray-400 text-sm">VIN: {{ vehiculo.vin || 'No especificado' }}</p>
+          <p v-if="vehiculo.principal" class="mt-1 text-xs bg-blue-600 text-white px-2 py-0.5 rounded-sm inline-block">Principal</p>
+        </div>
+        <div class="flex mt-2 md:mt-0">
+          <button 
+            @click="editarVehiculo(vehiculo)" 
+            class="text-white bg-blue-600 hover:bg-blue-700 px-3 py-1 rounded-md mr-2"
+          >
+            Editar
+          </button>
+          <button 
+            @click="eliminarVehiculo(vehiculo.id)" 
+            class="text-white bg-red-600 hover:bg-red-700 px-3 py-1 rounded-md"
+          >
+            Eliminar
+          </button>
+        </div>
+      </div>
+      
+      <!-- Mensaje si no hay vehículos -->
+      <div v-if="vehiculos.length === 0" class="text-center text-gray-400 py-4">
+        No tienes vehículos registrados.
+      </div>
+    </div>
+  </div>
+  
+  <!-- Formulario de vehículo (modal) -->
+  <div v-if="mostrarFormulario" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
+    <div class="w-full max-w-2xl">
+      <FormularioVehiculo 
+        :vehiculo="vehiculoEditando" 
+        :modo="modoFormulario" 
+        @guardar="guardarVehiculo" 
+        @cancelar="cancelarFormulario"
+      />
+    </div>
+  </div>
+</div>
               <!-- Sección 3: Preferencias de la aplicación -->
               <div class="mb-8">
                 <h3 class="text-xl font-semibold text-white border-b border-gray-600 pb-2 mb-4">Preferencias de la Aplicación</h3>
@@ -176,8 +201,106 @@
   </div>
 </template>
 
+import { ref, reactive, onMounted } from 'vue';
+import FormularioVehiculo from '../components/configuracion/FormularioVehiculo.vue';
+
 <script>
 export default {
-  name: 'ConfiguracionPage'
-}
+  name: 'ConfiguracionPage',
+  components: {
+    FormularioVehiculo
+  },
+  setup() {
+    // Estado
+    const vehiculos = ref([
+      {
+        id: '1',
+        marca: 'Toyota',
+        modelo: 'Corolla',
+        ano: '2020',
+        vin: '1NXBR32E94Z123456',
+        color: 'Blanco',
+        placa: 'ABC-123',
+        kilometraje: '25000',
+        principal: true
+      },
+      {
+        id: '2',
+        marca: 'Honda',
+        modelo: 'Civic',
+        ano: '2019',
+        vin: '2HGES16505H123456',
+        color: 'Rojo',
+        placa: 'XYZ-789',
+        kilometraje: '35000',
+        principal: false
+      }
+    ]);
+    
+    const mostrarFormulario = ref(false);
+    const modoFormulario = ref('agregar');
+    const vehiculoEditando = ref(null);
+    
+    // Métodos
+    const editarVehiculo = (vehiculo) => {
+      vehiculoEditando.value = { ...vehiculo };
+      modoFormulario.value = 'editar';
+      mostrarFormulario.value = true;
+    };
+    
+    const eliminarVehiculo = (id) => {
+      if (confirm('¿Estás seguro de eliminar este vehículo?')) {
+        vehiculos.value = vehiculos.value.filter(v => v.id !== id);
+      }
+    };
+    
+    const guardarVehiculo = (vehiculo) => {
+      if (modoFormulario.value === 'editar') {
+        // Si es principal, quitar la marca de principal de los demás
+        if (vehiculo.principal) {
+          vehiculos.value = vehiculos.value.map(v => {
+            if (v.id !== vehiculo.id) {
+              return { ...v, principal: false };
+            }
+            return v;
+          });
+        }
+        
+        // Actualizar vehículo existente
+        const index = vehiculos.value.findIndex(v => v.id === vehiculo.id);
+        if (index !== -1) {
+          vehiculos.value[index] = vehiculo;
+        }
+      } else {
+        // Si es principal, quitar la marca de principal de los demás
+        if (vehiculo.principal) {
+          vehiculos.value = vehiculos.value.map(v => ({ ...v, principal: false }));
+        }
+        
+        // Agregar nuevo vehículo
+        vehiculos.value.push(vehiculo);
+      }
+      
+      mostrarFormulario.value = false;
+      vehiculoEditando.value = null;
+    };
+    
+    const cancelarFormulario = () => {
+      mostrarFormulario.value = false;
+      vehiculoEditando.value = null;
+    };
+    
+    return {
+      vehiculos,
+      mostrarFormulario,
+      modoFormulario,
+      vehiculoEditando,
+      editarVehiculo,
+      eliminarVehiculo,
+      guardarVehiculo,
+      cancelarFormulario
+    };
+  }
+};
+  
 </script>
