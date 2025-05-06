@@ -143,29 +143,103 @@
         </main>
     </div>
 
-    <!-- Modal para cambiar contraseña -->
     <div v-if="showPasswordModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-        <div class="bg-gray-800 rounded-lg shadow-lg max-w-md w-full p-6 border border-gray-700">
-            <!-- Contenido del modal... (se mantiene igual) -->
-            <div class="flex justify-between items-center mb-4">
-                <h3 class="text-xl font-semibold text-white">Cambiar contraseña</h3>
-                <button @click="showPasswordModal = false" class="text-gray-400 hover:text-white">
-                    <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
-                    </svg>
-                </button>
-            </div>
-            
-            <!-- Primera fase: verificar contraseña actual -->
-            <div v-if="passwordStep === 1">
-                <p class="text-gray-300 mb-4">Por favor ingresa tu contraseña actual para continuar</p>
-                <!-- El resto del modal para cambiar contraseña (se mantiene igual) -->
-                <!-- ... -->
-            </div>
-            
-            <!-- Resto del modal -->
-        </div>
+  <div class="bg-gray-800 rounded-lg shadow-lg max-w-md w-full p-6 border border-gray-700">
+    <div class="flex justify-between items-center mb-4">
+      <h3 class="text-xl font-semibold text-white">Cambiar contraseña</h3>
+      <button @click="showPasswordModal = false" class="text-gray-400 hover:text-white">
+        <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+        </svg>
+      </button>
     </div>
+    
+    <!-- Primera fase: verificar contraseña actual -->
+    <div v-if="passwordStep === 1">
+      <p class="text-gray-300 mb-4">Por favor ingresa tu contraseña actual para continuar</p>
+      
+      <div class="mb-4">
+        <label class="block text-sm font-medium text-gray-400 mb-1">Contraseña actual</label>
+        <input 
+          type="password" 
+          v-model="currentPassword" 
+          class="w-full px-3 py-2 bg-gray-700 text-white rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+          placeholder="Ingresa tu contraseña actual"
+        >
+        <p v-if="passwordError" class="mt-1 text-sm text-red-500">{{ passwordError }}</p>
+      </div>
+      
+      <div class="flex justify-end space-x-3">
+        <button @click="showPasswordModal = false" class="px-4 py-2 text-gray-300 hover:text-white">
+          Cancelar
+        </button>
+        <button 
+          @click="verifyCurrentPassword" 
+          class="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-md"
+          :disabled="!currentPassword"
+        >
+          Continuar
+        </button>
+      </div>
+    </div>
+    
+    <!-- Segunda fase: ingresar nueva contraseña -->
+    <div v-if="passwordStep === 2">
+      <p class="text-gray-300 mb-4">Ingresa tu nueva contraseña</p>
+      
+      <div class="mb-4">
+        <label class="block text-sm font-medium text-gray-400 mb-1">Nueva contraseña</label>
+        <input 
+          type="password" 
+          v-model="newPassword" 
+          class="w-full px-3 py-2 bg-gray-700 text-white rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+          placeholder="Ingresa tu nueva contraseña"
+        >
+      </div>
+      
+      <div class="mb-4">
+        <label class="block text-sm font-medium text-gray-400 mb-1">Confirmar nueva contraseña</label>
+        <input 
+          type="password" 
+          v-model="confirmPassword" 
+          class="w-full px-3 py-2 bg-gray-700 text-white rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+          placeholder="Confirma tu nueva contraseña"
+        >
+        <p v-if="passwordError" class="mt-1 text-sm text-red-500">{{ passwordError }}</p>
+      </div>
+      
+      <div class="flex justify-end space-x-3">
+        <button @click="passwordStep = 1" class="px-4 py-2 text-gray-300 hover:text-white">
+          Atrás
+        </button>
+        <button 
+          @click="changePassword" 
+          class="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-md"
+          :disabled="!newPassword || !confirmPassword"
+        >
+          Cambiar contraseña
+        </button>
+      </div>
+    </div>
+    
+    <!-- Tercera fase: confirmación -->
+    <div v-if="passwordStep === 3" class="text-center py-4">
+      <div class="flex justify-center mb-4">
+        <svg class="w-16 h-16 text-green-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+        </svg>
+      </div>
+      <h3 class="text-xl font-medium text-white mb-2">¡Contraseña actualizada!</h3>
+      <p class="text-gray-300 mb-4">Tu contraseña ha sido cambiada exitosamente.</p>
+      <button 
+        @click="closePasswordModal"
+        class="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-md"
+      >
+        Cerrar
+      </button>
+    </div>
+  </div>
+</div>
 </template>
 
 <script>

@@ -1,5 +1,4 @@
-// ===== auth.js =====
-// Ubicación: /src/stores/auth.js
+
 
 import { defineStore } from 'pinia';
 import axios from 'axios';
