@@ -312,40 +312,49 @@ export default {
     };
     
     const guardarVehiculo = (vehiculo) => {
-      if (modoFormularioVehiculo.value === 'editar') {
-        // Si es principal, quitar la marca de principal de los demás
-        if (vehiculo.principal) {
-          vehiculos.value = vehiculos.value.map(v => {
-            if (v.id !== vehiculo.id) {
-              return { ...v, principal: false };
-            }
-            return v;
-          });
+  console.log('Recibido vehículo para guardar:', vehiculo);
+  
+  if (modoFormularioVehiculo.value === 'editar') {
+    // Si es principal, quitar la marca de principal de los demás
+    if (vehiculo.principal) {
+      vehiculos.value = vehiculos.value.map(v => {
+        if (v.id !== vehiculo.id) {
+          return { ...v, principal: false };
         }
+        return v;
+      });
+    }
         
-        // Actualizar vehículo existente
-        const index = vehiculos.value.findIndex(v => v.id === vehiculo.id);
-        if (index !== -1) {
-          vehiculos.value[index] = vehiculo;
-        }
-      } else {
-        // Si es principal, quitar la marca de principal de los demás
-        if (vehiculo.principal) {
-          vehiculos.value = vehiculos.value.map(v => ({ ...v, principal: false }));
-        }
+    // Actualizar vehículo existente
+    const index = vehiculos.value.findIndex(v => v.id === vehiculo.id);
+    if (index !== -1) {
+      // Crear un nuevo array para asegurar la reactividad
+      const nuevosVehiculos = [...vehiculos.value];
+      nuevosVehiculos[index] = vehiculo;
+      vehiculos.value = nuevosVehiculos;
+      console.log('Vehículo actualizado en posición:', index);
+    }
+  } else {
+    // Si es principal, quitar la marca de principal de los demás
+    if (vehiculo.principal) {
+      vehiculos.value = vehiculos.value.map(v => ({ ...v, principal: false }));
+    }
         
-        // Agregar nuevo vehículo
-        vehiculos.value.push(vehiculo);
-      }
-      
-      mostrarFormularioVehiculo.value = false;
-      vehiculoEditando.value = null;
-    };
+    // Agregar nuevo vehículo
+    vehiculos.value = [...vehiculos.value, vehiculo];
+    console.log('Nuevo vehículo agregado, total ahora:', vehiculos.value.length);
+  }
+  
+  console.log('Estado final de vehiculos:', vehiculos.value);
+  mostrarFormularioVehiculo.value = false;
+  vehiculoEditando.value = null;
+};
     
-    const cancelarFormularioVehiculo = () => {
-      mostrarFormularioVehiculo.value = false;
-      vehiculoEditando.value = null;
-    };
+const cancelarFormularioVehiculo = () => {
+  console.log('Cancelando formulario de vehículo');
+  mostrarFormularioVehiculo.value = false;
+  vehiculoEditando.value = null;
+};
     
     // Métodos para el formulario de métodos de pago
     const editarMetodoPago = (metodoPago) => {

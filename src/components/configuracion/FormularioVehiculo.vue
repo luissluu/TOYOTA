@@ -3,7 +3,7 @@
   <div class="bg-gray-700 rounded-lg p-6">
     <h4 class="text-lg font-medium text-white mb-4">{{ modo === 'editar' ? 'Editar Vehículo' : 'Añadir Nuevo Vehículo' }}</h4>
     
-    <form @submit.prevent="enviarFormulario(guardarVehiculo)" class="space-y-4">
+    <form @submit.prevent="manejarSubmit" class="space-y-4">
       <!-- Marca -->
       <CampoValidado
         id="marca"
@@ -175,7 +175,7 @@
         <button
           type="submit"
           class="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition flex items-center"
-          :disabled="cargando || !formularioValido"
+          :disabled="cargando"
         >
           <svg v-if="cargando" class="animate-spin -ml-1 mr-2 h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
             <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
@@ -189,10 +189,36 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue';
+import { ref, onMounted, watch } from 'vue';
 import CampoValidado from '../ui/CampoValidado.vue';
 import { validarSoloLetras, validarVIN } from '../../utils/validaciones';
 import { useFormulario } from '../../composables/useFormulario';
+
+// Define las funciones de validación antes de usarlas en esquemaValidacion
+const validarAno = (valor) => {
+  if (!valor) return true; // Si está vacío, lo manejará la validación de requerido
+  
+  const ano = parseInt(valor, 10);
+  const anoActual = new Date().getFullYear();
+  return !isNaN(ano) && ano >= 1900 && ano <= anoActual;
+};
+
+const validarPlaca = (valor) => {
+  if (!valor) return true; // Si está vacío, es válido (no es obligatorio)
+  
+  // Formato típico de placas mexicanas: 3 letras seguidas de 3 números
+  // O también: 3 letras, guión, 3 números
+  // También aceptamos los formatos anteriores
+  const patron = /^[A-Z]{2,3}[-\s]?[0-9]{2,4}$/i;
+  return patron.test(valor);
+};
+
+const validarKilometraje = (valor) => {
+  if (!valor) return true; // Si está vacío, es válido (no es obligatorio)
+  
+  const km = parseInt(valor, 10);
+  return !isNaN(km) && km >= 0 && km <= 1000000; // Valor máximo razonable
+};
 
 const props = defineProps({
   vehiculo: {
@@ -286,52 +312,42 @@ const {
   enviarFormulario
 } = useFormulario(esquemaValidacion, valoresIniciales);
 
-// Funciones de validación adicionales
-const validarAno = (valor) => {
-  if (!valor) return true; // Si está vacío, lo manejará la validación de requerido
-  
-  const ano = parseInt(valor, 10);
-  const anoActual = new Date().getFullYear();
-  return !isNaN(ano) && ano >= 1900 && ano <= anoActual;
-};
-
-const validarPlaca = (valor) => {
-  if (!valor) return true; // Si está vacío, es válido (no es obligatorio)
-  
-  // Formato típico de placas mexicanas: 3 letras seguidas de 3 números
-  // O también: 3 letras, guión, 3 números
-  // También aceptamos los formatos anteriores
-  const patron = /^[A-Z]{2,3}[-\s]?[0-9]{2,4}$/i;
-  return patron.test(valor);
-};
-
-const validarKilometraje = (valor) => {
-  if (!valor) return true; // Si está vacío, es válido (no es obligatorio)
-  
-  const km = parseInt(valor, 10);
-  return !isNaN(km) && km >= 0 && km <= 1000000; // Valor máximo razonable
-};
+// Monitor de estado para depuración
+watch(() => formularioValido.value, (newVal) => {
+  console.log('Estado de formularioValido:', newVal);
+});
 
 // Función para guardar el vehículo
 const guardarVehiculo = async () => {
   try {
+    console.log('Iniciando guardado del vehículo...');
+    console.log('Datos del vehículo a guardar:', formulario);
+    
     // Simular guardado (en un entorno real, sería una petición al backend)
     await new Promise(resolve => setTimeout(resolve, 800));
     
-    // Emitir evento con los datos del vehículo
-    emit('guardar', {
+    // Preparar el objeto a emitir
+    const vehiculoData = {
       ...formulario,
       id: props.modo === 'editar' ? props.vehiculo.id : Date.now().toString(), // Generar ID para nuevos vehículos
-    });
+    };
     
+    console.log('Emitiendo evento guardar con datos:', vehiculoData);
+    
+    // Emitir evento con los datos del vehículo
+    emit('guardar', vehiculoData);
+    
+    console.log('Evento emitido correctamente');
     return true;
   } catch (error) {
+    console.error('Error al guardar el vehículo:', error);
     throw new Error('Error al guardar el vehículo. Por favor, intenta nuevamente.');
   }
 };
 
 // Función para cancelar el formulario
 const cancelar = () => {
+  console.log('Cancelando formulario...');
   resetearFormulario();
   emit('cancelar');
 };
@@ -341,8 +357,33 @@ const validacionCampo = (campo, esValido) => {
   console.log(`Campo ${campo} validado: ${esValido}`);
 };
 
+// Función para manejar el submit del formulario
+const manejarSubmit = (event) => {
+  event.preventDefault();
+  console.log('Formulario enviado, validando...');
+  
+  // Validación manual de todos los campos
+  Object.keys(formulario).forEach(campo => {
+    if (esquemaValidacion[campo] && esquemaValidacion[campo].requerido) {
+      validarCampo(campo);
+    }
+    console.log(`Campo ${campo}: ${formulario[campo]}, error: ${errores[campo]}`);
+  });
+  
+  // Verificar si el formulario es válido antes de enviar
+  if (validarFormulario()) {
+    console.log('Formulario válido, procediendo a guardar...');
+    guardarVehiculo();
+  } else {
+    console.log('Formulario inválido, no se puede guardar.');
+  }
+};
+
 // Al montar el componente, si es modo editar, cargamos los datos del vehículo
 onMounted(() => {
+  console.log('FormularioVehiculo montado, modo:', props.modo);
+  console.log('Vehiculo recibido:', props.vehiculo);
+  
   if (props.modo === 'editar' && props.vehiculo) {
     // Asignar valores del vehículo al formulario
     Object.keys(formulario).forEach(key => {
@@ -350,6 +391,7 @@ onMounted(() => {
         formulario[key] = props.vehiculo[key];
       }
     });
+    console.log('Formulario inicializado con datos del vehículo:', formulario);
   }
 });
 </script>

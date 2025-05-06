@@ -3,7 +3,7 @@
     <div class="bg-gray-700 rounded-lg p-6">
       <h4 class="text-lg font-medium text-white mb-4">{{ modo === 'editar' ? 'Editar Método de Pago' : 'Añadir Nuevo Método de Pago' }}</h4>
       
-      <form @submit.prevent="enviarFormulario(guardarMetodoPago)" class="space-y-4">
+      <form @submit.prevent="manejarSubmit" class="space-y-4">
         <!-- Tipo de tarjeta -->
         <div>
           <label class="block text-sm font-medium text-gray-300 mb-1">Tipo de Tarjeta</label>
@@ -63,7 +63,7 @@
           label="Número de Tarjeta"
           placeholder="1234 5678 9012 3456"
           required
-          maxlength="19"
+          :maxlength="19"
           :validator="validarNumeroTarjeta"
           errorMessage="Número de tarjeta inválido"
         >
@@ -125,7 +125,7 @@
             label="Fecha de Expiración"
             placeholder="MM/AA"
             required
-            maxlength="5"
+            :maxlength="5"
             :validator="validarFechaExpiracion"
             errorMessage="Formato MM/AA inválido"
           >
@@ -147,7 +147,7 @@
             placeholder="123"
             required
             type="password"
-            maxlength="4"
+            :maxlength="4"
             soloNumeros
             :validator="validarCVV"
             errorMessage="CVV inválido"
@@ -183,16 +183,16 @@
             Cancelar
           </button>
           <button
-            type="submit"
-            class="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition flex items-center"
-            :disabled="cargando || !formularioValido"
-          >
-            <svg v-if="cargando" class="animate-spin -ml-1 mr-2 h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-              <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-              <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-            </svg>
-            {{ cargando ? 'Guardando...' : 'Guardar' }}
-          </button>
+  type="submit"
+  class="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition flex items-center"
+  :disabled="cargando"
+>
+  <svg v-if="cargando" class="animate-spin -ml-1 mr-2 h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+    <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+    <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+  </svg>
+  {{ cargando ? 'Guardando...' : 'Guardar' }}
+</button>
         </div>
       </form>
     </div>
@@ -217,6 +217,67 @@
   
   const emit = defineEmits(['guardar', 'cancelar']);
   
+  // Funciones de validación adicionales
+  const validarNumeroTarjeta = (valor) => {
+    if (!valor) return true; // Si está vacío, lo manejará la validación de requerido
+    
+    // Eliminar espacios y guiones
+    const numeroLimpio = valor.replace(/[\s-]/g, '');
+    
+    // Validar según el tipo de tarjeta
+    if (formulario.tipo === 'visa') {
+      // Visa comienza con 4 y tiene 16 dígitos
+      return /^4[0-9]{15}$/.test(numeroLimpio);
+    } else if (formulario.tipo === 'mastercard') {
+      // Mastercard comienza con 51-55 o 2221-2720 y tiene 16 dígitos
+      return /^(5[1-5][0-9]{14}|2[2-7][0-9]{14})$/.test(numeroLimpio);
+    } else if (formulario.tipo === 'amex') {
+      // American Express comienza con 34 o 37 y tiene 15 dígitos
+      return /^3[47][0-9]{13}$/.test(numeroLimpio);
+    }
+    
+    // Validación genérica (si no se ha seleccionado tipo)
+    return /^[0-9]{13,19}$/.test(numeroLimpio);
+  };
+  
+  const validarNombreTitular = (valor) => {
+    if (!valor) return true; // Si está vacío, lo manejará la validación de requerido
+    
+    // Al menos dos palabras (nombre y apellido)
+    return valor.trim().split(/\s+/).filter(word => word.length > 0).length >= 2;
+  };
+  
+  const validarFechaExpiracion = (valor) => {
+    if (!valor) return true; // Si está vacío, lo manejará la validación de requerido
+    
+    // Formato MM/AA
+    if (!/^\d{2}\/\d{2}$/.test(valor)) return false;
+    
+    const [mes, anio] = valor.split('/').map(part => parseInt(part, 10));
+    const fechaActual = new Date();
+    const anioActual = fechaActual.getFullYear() % 100; // Últimos dos dígitos del año
+    const mesActual = fechaActual.getMonth() + 1; // Enero es 0
+    
+    // Validar rango del mes (1-12)
+    if (mes < 1 || mes > 12) return false;
+    
+    // Validar que la fecha no esté vencida
+    if (anio < anioActual || (anio === anioActual && mes < mesActual)) return false;
+    
+    return true;
+  };
+  
+  const validarCVV = (valor) => {
+    if (!valor) return true; // Si está vacío, lo manejará la validación de requerido
+    
+    // American Express tiene CVV de 4 dígitos, el resto de 3
+    if (formulario.tipo === 'amex') {
+      return /^\d{4}$/.test(valor);
+    }
+    
+    return /^\d{3}$/.test(valor);
+  };
+
   // Esquema de validación del formulario
   const esquemaValidacion = {
     tipo: {
@@ -287,71 +348,20 @@
   
   // Función para seleccionar tipo de tarjeta
   const seleccionarTipoTarjeta = (tipo) => {
-    formulario.tipo = tipo;
-    // Elimina el error de tipo si existe
-    errores.tipo = '';
-  };
+  formulario.tipo = tipo;
+  // Elimina el error de tipo si existe
+  errores.tipo = '';
+  console.log('Tipo de tarjeta seleccionado:', tipo);
   
-  // Funciones de validación adicionales
-  const validarNumeroTarjeta = (valor) => {
-    if (!valor) return true; // Si está vacío, lo manejará la validación de requerido
-    
-    // Eliminar espacios y guiones
-    const numeroLimpio = valor.replace(/[\s-]/g, '');
-    
-    // Validar según el tipo de tarjeta
-    if (formulario.tipo === 'visa') {
-      // Visa comienza con 4 y tiene 16 dígitos
-      return /^4[0-9]{15}$/.test(numeroLimpio);
-    } else if (formulario.tipo === 'mastercard') {
-      // Mastercard comienza con 51-55 o 2221-2720 y tiene 16 dígitos
-      return /^(5[1-5][0-9]{14}|2[2-7][0-9]{14})$/.test(numeroLimpio);
-    } else if (formulario.tipo === 'amex') {
-      // American Express comienza con 34 o 37 y tiene 15 dígitos
-      return /^3[47][0-9]{13}$/.test(numeroLimpio);
-    }
-    
-    // Validación genérica (si no se ha seleccionado tipo)
-    return /^[0-9]{13,19}$/.test(numeroLimpio);
-  };
+  // Validar inmediatamente después de seleccionar
+  validarCampo('tipo');
   
-  const validarNombreTitular = (valor) => {
-    if (!valor) return true; // Si está vacío, lo manejará la validación de requerido
-    
-    // Al menos dos palabras (nombre y apellido)
-    return valor.trim().split(/\s+/).filter(word => word.length > 0).length >= 2;
-  };
+  // Re-validar campos que dependen del tipo
+  if (formulario.numeroTarjeta) validarCampo('numeroTarjeta');
+  if (formulario.cvv) validarCampo('cvv');
+};
   
-  const validarFechaExpiracion = (valor) => {
-    if (!valor) return true; // Si está vacío, lo manejará la validación de requerido
-    
-    // Formato MM/AA
-    if (!/^\d{2}\/\d{2}$/.test(valor)) return false;
-    
-    const [mes, anio] = valor.split('/').map(part => parseInt(part, 10));
-    const fechaActual = new Date();
-    const anioActual = fechaActual.getFullYear() % 100; // Últimos dos dígitos del año
-    const mesActual = fechaActual.getMonth() + 1; // Enero es 0
-    
-    // Validar rango del mes (1-12)
-    if (mes < 1 || mes > 12) return false;
-    
-    // Validar que la fecha no esté vencida
-    if (anio < anioActual || (anio === anioActual && mes < mesActual)) return false;
-    
-    return true;
-  };
-  
-  const validarCVV = (valor) => {
-    if (!valor) return true; // Si está vacío, lo manejará la validación de requerido
-    
-    // American Express tiene CVV de 4 dígitos, el resto de 3
-    if (formulario.tipo === 'amex') {
-      return /^\d{4}$/.test(valor);
-    }
-    
-    return /^\d{3}$/.test(valor);
-  };
+
   
   // Formatear número de tarjeta al estilo 1234 5678 9012 3456
   watch(() => formulario.numeroTarjeta, (nuevoValor) => {
@@ -401,29 +411,58 @@
       formulario.fechaExpiracion = formateado;
     }
   });
+  watch(() => formularioValido.value, (newVal) => {
+  console.log('Estado formularioValido cambió a:', newVal);
+});
+
+const manejarSubmit = (event) => {
+  event.preventDefault();
+  console.log('Formulario enviado, validando...');
   
+  // Validación manual de todos los campos
+  Object.keys(formulario).forEach(campo => {
+    if (esquemaValidacion[campo] && esquemaValidacion[campo].requerido) {
+      validarCampo(campo);
+    }
+    console.log(`Campo ${campo}: ${formulario[campo]}, error: ${errores[campo]}`);
+  });
+  
+  // Verificar si el formulario es válido antes de enviar
+  if (validarFormulario()) {
+    console.log('Formulario válido, procediendo a guardar...');
+    guardarMetodoPago();
+  } else {
+    console.log('Formulario inválido, no se puede guardar.');
+    console.log('Errores:', errores);
+  }
+};
+
   // Función para guardar el método de pago
   const guardarMetodoPago = async () => {
-    try {
-      // Simular guardado (en un entorno real, sería una petición al backend)
-      await new Promise(resolve => setTimeout(resolve, 800));
-      
-      // Preparar los datos para enviar
-      const datosTarjeta = {
-        ...formulario,
-        // Ocultar parte del número de tarjeta para mostrar en la UI (última parte visible)
-        numeroVisible: formulario.numeroTarjeta.replace(/\s/g, '').slice(-4),
-        id: props.modo === 'editar' ? props.metodoPago.id : Date.now().toString(), // Generar ID para nuevos métodos
-      };
-      
-      // Emitir evento con los datos del método de pago
-      emit('guardar', datosTarjeta);
-      
-      return true;
-    } catch (error) {
-      throw new Error('Error al guardar el método de pago. Por favor, intenta nuevamente.');
-    }
-  };
+  try {
+    console.log('Iniciando guardado del método de pago');
+    console.log('Datos del formulario:', formulario);
+    
+    // Simular guardado
+    await new Promise(resolve => setTimeout(resolve, 800));
+    
+    // Preparar los datos para enviar
+    const datosTarjeta = {
+      ...formulario,
+      numeroVisible: formulario.numeroTarjeta.replace(/\s/g, '').slice(-4),
+      id: props.modo === 'editar' ? props.metodoPago.id : Date.now().toString(),
+    };
+    
+    console.log('Emitiendo evento guardar con datos:', datosTarjeta);
+    emit('guardar', datosTarjeta);
+    console.log('Evento emitido');
+    
+    return true;
+  } catch (error) {
+    console.error('Error al guardar:', error);
+    throw new Error('Error al guardar el método de pago. Por favor, intenta nuevamente.');
+  }
+};
   
   // Función para cancelar el formulario
   const cancelar = () => {
