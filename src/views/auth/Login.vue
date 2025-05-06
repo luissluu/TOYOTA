@@ -226,7 +226,7 @@ const handleLogin = async () => {
     }));
     
     // Redirigir al dashboard o página principal
-    router.push('/');
+    router.push('/Home');
     
     return true;
   } catch (error) {

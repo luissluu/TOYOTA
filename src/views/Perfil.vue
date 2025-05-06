@@ -31,12 +31,50 @@
                   </div>
                 </div>
               </div>
+              
+              <!-- Historial de actividad -->
+              <div class="mb-8">
+                <h3 class="text-xl font-semibold text-white border-b border-gray-600 pb-2 mb-4">Actividad reciente</h3>
+                <div class="bg-gray-700 rounded-lg p-6">
+                  <div class="space-y-4">
+                    <div class="bg-gray-800 p-4 rounded-lg">
+                      <div class="flex justify-between items-center">
+                        <div>
+                          <h4 class="text-white font-medium">Servicio de cambio de aceite</h4>
+                          <p class="text-gray-400 text-sm">Completado - 26 abril, 2025</p>
+                        </div>
+                        <span class="bg-green-100 text-green-800 text-xs font-semibold px-2.5 py-0.5 rounded-sm">Completado</span>
+                      </div>
+                    </div>
+                    
+                    <div class="bg-gray-800 p-4 rounded-lg">
+                      <div class="flex justify-between items-center">
+                        <div>
+                          <h4 class="text-white font-medium">Cambio de filtro de aire</h4>
+                          <p class="text-gray-400 text-sm">En proceso - 3 mayo, 2025</p>
+                        </div>
+                        <span class="bg-blue-100 text-blue-800 text-xs font-semibold px-2.5 py-0.5 rounded-sm">En proceso</span>
+                      </div>
+                    </div>
+                    
+                    <div class="bg-gray-800 p-4 rounded-lg">
+                      <div class="flex justify-between items-center">
+                        <div>
+                          <h4 class="text-white font-medium">Alineación y balanceo</h4>
+                          <p class="text-gray-400 text-sm">Programado - 10 mayo, 2025</p>
+                        </div>
+                        <span class="bg-yellow-100 text-yellow-800 text-xs font-semibold px-2.5 py-0.5 rounded-sm">Pendiente</span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
             </div>
           </div>
         </div>
       </div>
-      </section>
-    </div>
+    </section>
+  </div>
 </template>
 
 <script>
