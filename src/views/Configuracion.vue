@@ -1,3 +1,4 @@
+<!-- src/views/Configuracion.vue -->
 <template>
   <div class="flex flex-col w-full px-6">
     <section class="grid grid-cols-1 gap-8 px-8 md:grid-cols-2">
@@ -39,7 +40,7 @@
                   <div class="flex justify-between items-center mb-4">
                     <h4 class="text-lg font-medium text-white">Vehículos Registrados</h4>
                     <button 
-                      @click="mostrarFormulario = true; modoFormulario = 'agregar'"
+                      @click="mostrarFormularioVehiculo = true; modoFormularioVehiculo = 'agregar'; vehiculoEditando = null"
                       class="px-3 py-1 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition"
                     >
                       + Añadir Vehículo
@@ -82,13 +83,13 @@
                 </div>
                 
                 <!-- Formulario de vehículo (modal) -->
-                <div v-if="mostrarFormulario" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
+                <div v-if="mostrarFormularioVehiculo" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
                   <div class="w-full max-w-2xl">
                     <FormularioVehiculo 
                       :vehiculo="vehiculoEditando" 
-                      :modo="modoFormulario" 
+                      :modo="modoFormularioVehiculo" 
                       @guardar="guardarVehiculo" 
-                      @cancelar="cancelarFormulario"
+                      @cancelar="cancelarFormularioVehiculo"
                     />
                   </div>
                 </div>
@@ -130,48 +131,77 @@
                 <div class="bg-gray-700 rounded-lg p-6">
                   <div class="flex justify-between items-center mb-4">
                     <h4 class="text-lg font-medium text-white">Tarjetas Guardadas</h4>
-                    <button class="px-3 py-1 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition">+ Añadir Tarjeta</button>
+                    <button 
+                      @click="mostrarFormularioPago = true; modoFormularioPago = 'agregar'; metodoPagoEditando = null"
+                      class="px-3 py-1 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition"
+                    >
+                      + Añadir Tarjeta
+                    </button>
                   </div>
                   
                   <!-- Lista de tarjetas -->
                   <div class="space-y-4">
-                    <!-- Tarjeta 1 -->
-                    <div class="bg-gray-800 rounded-lg p-4 flex flex-col md:flex-row justify-between items-start md:items-center">
+                    <div 
+                      v-for="metodoPago in metodosPago" 
+                      :key="metodoPago.id" 
+                      class="bg-gray-800 rounded-lg p-4 flex flex-col md:flex-row justify-between items-start md:items-center"
+                    >
                       <div class="flex items-center">
-                        <svg class="w-10 h-10 mr-3" viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg">
-                          <rect width="40" height="40" rx="4" fill="#1434CB" />
-                          <path d="M14.5 24.5H25.5V28H14.5V24.5Z" fill="#F7B600" />
-                          <path d="M14.5 12H25.5V20.5H14.5V12Z" fill="#FFFFFF" />
-                        </svg>
+                        <!-- Icono según tipo de tarjeta -->
+                        <div class="w-10 h-10 mr-3 flex items-center justify-center">
+                          <svg v-if="metodoPago.tipo === 'visa'" class="w-10 h-6" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <rect width="48" height="48" rx="4" fill="#1434CB" />
+                            <path d="M14.5 24.5H25.5V28H14.5V24.5Z" fill="#F7B600" />
+                            <path d="M14.5 12H25.5V20.5H14.5V12Z" fill="#FFFFFF" />
+                          </svg>
+                          <svg v-else-if="metodoPago.tipo === 'mastercard'" class="w-10 h-6" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <rect width="48" height="48" rx="4" fill="#EB001B" />
+                            <circle cx="16" cy="24" r="8" fill="#FF5F00" />
+                            <circle cx="32" cy="24" r="8" fill="#F79E1B" />
+                          </svg>
+                          <svg v-else-if="metodoPago.tipo === 'amex'" class="w-10 h-6" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <rect width="48" height="48" rx="4" fill="#016FD0" />
+                            <path d="M24 31H36V17H24V31Z" fill="#FFFFFF" />
+                          </svg>
+                        </div>
                         <div>
-                          <h5 class="text-white font-medium">Visa terminada en 4567</h5>
-                          <p class="text-gray-400 text-sm">Expiración: 05/28</p>
+                          <h5 class="text-white font-medium">{{ metodoPago.tipo.charAt(0).toUpperCase() + metodoPago.tipo.slice(1) }} terminada en {{ metodoPago.numeroVisible }}</h5>
+                          <p class="text-gray-400 text-sm">Expiración: {{ metodoPago.fechaExpiracion }}</p>
+                          <p v-if="metodoPago.predeterminada" class="mt-1 text-xs bg-blue-600 text-white px-2 py-0.5 rounded-sm inline-block">Predeterminada</p>
                         </div>
                       </div>
                       <div class="flex mt-2 md:mt-0">
-                        <button class="text-white bg-blue-600 hover:bg-blue-700 px-3 py-1 rounded-md mr-2">Editar</button>
-                        <button class="text-white bg-red-600 hover:bg-red-700 px-3 py-1 rounded-md">Eliminar</button>
+                        <button 
+                          @click="editarMetodoPago(metodoPago)" 
+                          class="text-white bg-blue-600 hover:bg-blue-700 px-3 py-1 rounded-md mr-2"
+                        >
+                          Editar
+                        </button>
+                        <button 
+                          @click="eliminarMetodoPago(metodoPago.id)" 
+                          class="text-white bg-red-600 hover:bg-red-700 px-3 py-1 rounded-md"
+                        >
+                          Eliminar
+                        </button>
                       </div>
                     </div>
                     
-                    <!-- Tarjeta 2 -->
-                    <div class="bg-gray-800 rounded-lg p-4 flex flex-col md:flex-row justify-between items-start md:items-center">
-                      <div class="flex items-center">
-                        <svg class="w-10 h-10 mr-3" viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg">
-                          <rect width="40" height="40" rx="4" fill="#EB001B" />
-                          <circle cx="16" cy="20" r="8" fill="#FF5F00" />
-                          <circle cx="24" cy="20" r="8" fill="#F79E1B" />
-                        </svg>
-                        <div>
-                          <h5 class="text-white font-medium">Mastercard terminada en 8901</h5>
-                          <p class="text-gray-400 text-sm">Expiración: 11/27</p>
-                        </div>
-                      </div>
-                      <div class="flex mt-2 md:mt-0">
-                        <button class="text-white bg-blue-600 hover:bg-blue-700 px-3 py-1 rounded-md mr-2">Editar</button>
-                        <button class="text-white bg-red-600 hover:bg-red-700 px-3 py-1 rounded-md">Eliminar</button>
-                      </div>
+                    <!-- Mensaje si no hay tarjetas -->
+                    <div v-if="metodosPago.length === 0" class="text-center text-gray-400 py-4">
+                      No tienes tarjetas guardadas.
                     </div>
+                  </div>
+                </div>
+                
+                <!-- Formulario de método de pago (modal) -->
+                <div v-if="mostrarFormularioPago" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
+                  <div class="w-full max-w-2xl">
+                    <FormularioMetodoPago 
+                      :metodoPago="metodoPagoEditando" 
+                      :modo="modoFormularioPago" 
+                      @guardar="guardarMetodoPago" 
+                      @cancelar="cancelarFormularioPago"
+                    />
                   </div>
                 </div>
               </div>
@@ -184,14 +214,16 @@
 </template>
 
 <script>
-import { ref, reactive, onMounted } from 'vue';
+import { ref, reactive } from 'vue';
 import FormularioVehiculo from '../components/configuracion/FormularioVehiculo.vue';
+import FormularioMetodoPago from '../components/configuracion/FormularioMetodoPago.vue';
 import FormularioPerfil from '../components/perfil/FormularioPerfil.vue';
 
 export default {
   name: 'ConfiguracionPage',
   components: {
     FormularioVehiculo,
+    FormularioMetodoPago,
     FormularioPerfil
   },
   setup() {
@@ -221,10 +253,39 @@ export default {
       }
     ]);
     
+    // Estado para métodos de pago
+    const metodosPago = ref([
+      {
+        id: '1',
+        tipo: 'visa',
+        numeroTarjeta: '4111 1111 1111 1111',
+        numeroVisible: '1111',
+        nombreTitular: 'Luis González',
+        fechaExpiracion: '05/27',
+        cvv: '123',
+        predeterminada: true
+      },
+      {
+        id: '2',
+        tipo: 'mastercard',
+        numeroTarjeta: '5555 5555 5555 4444',
+        numeroVisible: '4444',
+        nombreTitular: 'Luis González',
+        fechaExpiracion: '11/26',
+        cvv: '456',
+        predeterminada: false
+      }
+    ]);
+    
     // Estado para el formulario de vehículos
-    const mostrarFormulario = ref(false);
-    const modoFormulario = ref('agregar');
+    const mostrarFormularioVehiculo = ref(false);
+    const modoFormularioVehiculo = ref('agregar');
     const vehiculoEditando = ref(null);
+    
+    // Estado para el formulario de métodos de pago
+    const mostrarFormularioPago = ref(false);
+    const modoFormularioPago = ref('agregar');
+    const metodoPagoEditando = ref(null);
     
     // Estado para el perfil de usuario
     const usuarioPerfil = ref({
@@ -240,8 +301,8 @@ export default {
     // Métodos para el formulario de vehículos
     const editarVehiculo = (vehiculo) => {
       vehiculoEditando.value = { ...vehiculo };
-      modoFormulario.value = 'editar';
-      mostrarFormulario.value = true;
+      modoFormularioVehiculo.value = 'editar';
+      mostrarFormularioVehiculo.value = true;
     };
     
     const eliminarVehiculo = (id) => {
@@ -251,7 +312,7 @@ export default {
     };
     
     const guardarVehiculo = (vehiculo) => {
-      if (modoFormulario.value === 'editar') {
+      if (modoFormularioVehiculo.value === 'editar') {
         // Si es principal, quitar la marca de principal de los demás
         if (vehiculo.principal) {
           vehiculos.value = vehiculos.value.map(v => {
@@ -277,32 +338,81 @@ export default {
         vehiculos.value.push(vehiculo);
       }
       
-      mostrarFormulario.value = false;
+      mostrarFormularioVehiculo.value = false;
       vehiculoEditando.value = null;
     };
     
-    const cancelarFormulario = () => {
-      mostrarFormulario.value = false;
+    const cancelarFormularioVehiculo = () => {
+      mostrarFormularioVehiculo.value = false;
       vehiculoEditando.value = null;
+    };
+    
+    // Métodos para el formulario de métodos de pago
+    const editarMetodoPago = (metodoPago) => {
+      metodoPagoEditando.value = { ...metodoPago };
+      modoFormularioPago.value = 'editar';
+      mostrarFormularioPago.value = true;
+    };
+    
+    const eliminarMetodoPago = (id) => {
+      if (confirm('¿Estás seguro de eliminar este método de pago?')) {
+        metodosPago.value = metodosPago.value.filter(m => m.id !== id);
+      }
+    };
+    
+    const guardarMetodoPago = (metodoPago) => {
+      if (modoFormularioPago.value === 'editar') {
+        // Si es predeterminado, quitar la marca de predeterminado de los demás
+        if (metodoPago.predeterminada) {
+          metodosPago.value = metodosPago.value.map(m => {
+            if (m.id !== metodoPago.id) {
+              return { ...m, predeterminada: false };
+            }
+            return m;
+          });
+        }
+        
+        // Actualizar método de pago existente
+        const index = metodosPago.value.findIndex(m => m.id === metodoPago.id);
+        if (index !== -1) {
+          metodosPago.value[index] = metodoPago;
+        }
+      } else {
+        // Si es predeterminado, quitar la marca de predeterminado de los demás
+        if (metodoPago.predeterminada) {
+          metodosPago.value = metodosPago.value.map(m => ({ ...m, predeterminada: false }));
+        }
+        
+        // Agregar nuevo método de pago
+        metodosPago.value.push(metodoPago);
+      }
+      
+      mostrarFormularioPago.value = false;
+      metodoPagoEditando.value = null;
+    };
+    
+    const cancelarFormularioPago = () => {
+      mostrarFormularioPago.value = false;
+      metodoPagoEditando.value = null;
     };
     
     // Métodos para el formulario de perfil
     const guardarPerfilUsuario = (datos) => {
-  console.log('Guardando datos del perfil:', datos);
-  
-  // Actualizar cada propiedad individualmente para asegurar la reactividad
-  Object.keys(datos).forEach(key => {
-    if (key in usuarioPerfil.value) {
-      usuarioPerfil.value[key] = datos[key];
-    }
-  });
-  
-  // Forzar una actualización de la referencia para garantizar la reactividad
-  usuarioPerfil.value = { ...usuarioPerfil.value };
-  
-  // Mostrar una notificación de éxito
-  alert('Perfil actualizado correctamente');
-};
+      console.log('Guardando datos del perfil:', datos);
+      
+      // Actualizar cada propiedad individualmente para asegurar la reactividad
+      Object.keys(datos).forEach(key => {
+        if (key in usuarioPerfil.value) {
+          usuarioPerfil.value[key] = datos[key];
+        }
+      });
+      
+      // Forzar una actualización de la referencia para garantizar la reactividad
+      usuarioPerfil.value = { ...usuarioPerfil.value };
+      
+      // Mostrar una notificación de éxito
+      alert('Perfil actualizado correctamente');
+    };
     
     const cancelarEdicionPerfil = () => {
       console.log('Edición del perfil cancelada');
@@ -311,14 +421,22 @@ export default {
     
     return {
       vehiculos,
-      mostrarFormulario,
-      modoFormulario,
+      metodosPago,
+      mostrarFormularioVehiculo,
+      modoFormularioVehiculo,
       vehiculoEditando,
+      mostrarFormularioPago,
+      modoFormularioPago,
+      metodoPagoEditando,
       usuarioPerfil,
       editarVehiculo,
       eliminarVehiculo,
       guardarVehiculo,
-      cancelarFormulario,
+      cancelarFormularioVehiculo,
+      editarMetodoPago,
+      eliminarMetodoPago,
+      guardarMetodoPago,
+      cancelarFormularioPago,
       guardarPerfilUsuario,
       cancelarEdicionPerfil
     };

@@ -1,3 +1,4 @@
+// src/router/index.js
 import { createRouter, createWebHistory } from 'vue-router'
 import Home from '../views/Home.vue'
 import Login from '../views/auth/Login.vue'
@@ -8,48 +9,29 @@ import Perfil from '../views/Perfil.vue'
 import Servicios from '../views/Servicios.vue'
 import Historial from '../views/Historial.vue'
 
+// Guardias de navegación para proteger rutas
+const requireAuth = (to, from, next) => {
+  const token = localStorage.getItem('auth_token') || sessionStorage.getItem('auth_token');
+  if (!token) {
+    next('/login');
+  } else {
+    next();
+  }
+};
 
 const routes = [
-
   {
     path: '/',
     redirect: '/login'  // Esto hará que la ruta raíz redirija a login
   },
   
+  // Rutas de autenticación
   {
     path: '/login',
     name: 'Login',
     component: Login,
     meta: { layout: 'auth' }
   },
-  
-  {
-    path: '/Home',
-    name: 'Home',
-    component: Home
-  },
-  {
-    path: '/Servicios',
-    name: 'Servicios',
-    component: () => import('../views/Servicios.vue')
-  },
-  {
-    path: '/Historial',
-    name: 'Historial',
-    component: () => import('../views/Historial.vue')
-  },
-  {
-    path: '/configuracion',
-    name: 'Configuracion',
-    component: Configuracion
-  },
-  {
-    path: '/perfil',
-    name: 'Perfil',
-    component: Perfil
-  },
-  // Rutas de autenticación
-
   {
     path: '/registro',
     name: 'Registro',
@@ -61,6 +43,44 @@ const routes = [
     name: 'RecuperarContrasena',
     component: RecuperacionContrasena,
     meta: { layout: 'auth' }
+  },
+  
+  // Rutas principales (protegidas)
+  {
+    path: '/Home',
+    name: 'Home',
+    component: Home,
+    meta: { requiresAuth: true }
+  },
+  {
+    path: '/Servicios',
+    name: 'Servicios',
+    component: Servicios,
+    meta: { requiresAuth: true }
+  },
+  {
+    path: '/Historial',
+    name: 'Historial',
+    component: Historial,
+    meta: { requiresAuth: true }
+  },
+  {
+    path: '/configuracion',
+    name: 'Configuracion',
+    component: Configuracion,
+    meta: { requiresAuth: true }
+  },
+  {
+    path: '/perfil',
+    name: 'Perfil',
+    component: Perfil,
+    meta: { requiresAuth: true }
+  },
+  
+  // Ruta para manejar páginas no encontradas
+  {
+    path: '/:pathMatch(.*)*',
+    redirect: '/Home'
   }
 ]
 
@@ -69,7 +89,7 @@ const router = createRouter({
   routes
 })
 
-// Guardia de navegación para proteger rutas
+// Guardia de navegación global
 router.beforeEach((to, from, next) => {
   // Obtener token de autenticación
   const token = localStorage.getItem('auth_token') || sessionStorage.getItem('auth_token');
@@ -80,7 +100,7 @@ router.beforeEach((to, from, next) => {
   } 
   // Si intenta acceder a rutas de autenticación y ya está autenticado, redirige a home
   else if ((to.path === '/login' || to.path === '/registro' || to.path === '/recuperar-contrasena') && token) {
-    next('/');
+    next('/Home');
   }
   // En otros casos, permite la navegación
   else {
