@@ -12,35 +12,19 @@
               <div class="mb-8">
                 <h3 class="text-xl font-semibold text-white border-b border-gray-600 pb-2 mb-4">Perfil de Usuario</h3>
                 <div class="bg-gray-700 rounded-lg p-6">
-                  <div class="flex flex-col md:flex-row md:items-center">
+                  <div class="flex flex-col md:flex-row md:items-start">
                     <div class="flex-shrink-0 mb-4 md:mb-0 md:mr-6">
                       <div class="w-24 h-24 bg-gray-500 rounded-full overflow-hidden">
-                        <img src="https://randomuser.me/api/portraits/men/68.jpg" alt="Foto de perfil" class="w-full h-full object-cover">
+                        <img :src="usuarioPerfil.foto" alt="Foto de perfil" class="w-full h-full object-cover">
                       </div>
                       <button class="mt-2 px-3 py-1 bg-blue-600 text-white text-sm rounded hover:bg-blue-700 w-full">Cambiar foto</button>
                     </div>
                     <div class="flex-grow">
-                      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        <div>
-                          <label class="block text-sm font-medium text-gray-400 mb-1">Nombre</label>
-                          <input type="text" value="Dhaiflaah" class="w-full px-3 py-2 bg-gray-600 text-white rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
-                        </div>
-                        <div>
-                          <label class="block text-sm font-medium text-gray-400 mb-1">Apellido</label>
-                          <input type="text" value="Usuario" class="w-full px-3 py-2 bg-gray-600 text-white rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
-                        </div>
-                        <div>
-                          <label class="block text-sm font-medium text-gray-400 mb-1">Email</label>
-                          <input type="email" value="dhaiflaah@ejemplo.com" class="w-full px-3 py-2 bg-gray-600 text-white rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
-                        </div>
-                        <div>
-                          <label class="block text-sm font-medium text-gray-400 mb-1">Teléfono</label>
-                          <input type="tel" value="+52 123 456 7890" class="w-full px-3 py-2 bg-gray-600 text-white rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
-                        </div>
-                      </div>
-                      <div class="mt-4">
-                        <button class="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition">Guardar Cambios</button>
-                      </div>
+                      <FormularioPerfil 
+                        :usuario="usuarioPerfil" 
+                        @guardar="guardarPerfilUsuario" 
+                        @cancelar="cancelarEdicionPerfil"
+                      />
                     </div>
                   </div>
                 </div>
@@ -202,14 +186,16 @@
 <script>
 import { ref, reactive, onMounted } from 'vue';
 import FormularioVehiculo from '../components/configuracion/FormularioVehiculo.vue';
+import FormularioPerfil from '../components/perfil/FormularioPerfil.vue';
 
 export default {
   name: 'ConfiguracionPage',
   components: {
-    FormularioVehiculo
+    FormularioVehiculo,
+    FormularioPerfil
   },
   setup() {
-    // Estado
+    // Estado de vehículos
     const vehiculos = ref([
       {
         id: '1',
@@ -235,11 +221,23 @@ export default {
       }
     ]);
     
+    // Estado para el formulario de vehículos
     const mostrarFormulario = ref(false);
     const modoFormulario = ref('agregar');
     const vehiculoEditando = ref(null);
     
-    // Métodos
+    // Estado para el perfil de usuario
+    const usuarioPerfil = ref({
+      id: '1',
+      nombre: 'Luis',
+      apellido: 'González',
+      email: 'luis.gonzalez@ejemplo.com',
+      telefono: '5512345678',
+      fechaNacimiento: '1985-06-15',
+      foto: 'https://randomuser.me/api/portraits/men/68.jpg'
+    });
+    
+    // Métodos para el formulario de vehículos
     const editarVehiculo = (vehiculo) => {
       vehiculoEditando.value = { ...vehiculo };
       modoFormulario.value = 'editar';
@@ -288,15 +286,41 @@ export default {
       vehiculoEditando.value = null;
     };
     
+    // Métodos para el formulario de perfil
+    const guardarPerfilUsuario = (datos) => {
+  console.log('Guardando datos del perfil:', datos);
+  
+  // Actualizar cada propiedad individualmente para asegurar la reactividad
+  Object.keys(datos).forEach(key => {
+    if (key in usuarioPerfil.value) {
+      usuarioPerfil.value[key] = datos[key];
+    }
+  });
+  
+  // Forzar una actualización de la referencia para garantizar la reactividad
+  usuarioPerfil.value = { ...usuarioPerfil.value };
+  
+  // Mostrar una notificación de éxito
+  alert('Perfil actualizado correctamente');
+};
+    
+    const cancelarEdicionPerfil = () => {
+      console.log('Edición del perfil cancelada');
+      // Aquí podrías restaurar valores originales si lo deseas
+    };
+    
     return {
       vehiculos,
       mostrarFormulario,
       modoFormulario,
       vehiculoEditando,
+      usuarioPerfil,
       editarVehiculo,
       eliminarVehiculo,
       guardarVehiculo,
-      cancelarFormulario
+      cancelarFormulario,
+      guardarPerfilUsuario,
+      cancelarEdicionPerfil
     };
   }
 };

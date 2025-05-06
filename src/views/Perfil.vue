@@ -6,33 +6,44 @@
           <h2 class="text-2xl font-bold tracking-tight text-white">Mi Perfil</h2>
           
           <div class="mt-6 text-white">
-            <!-- Información del perfil -->
+            <!-- Información del perfil (solo visualización) -->
             <div class="mt-8">
               <div class="mb-8">
                 <div class="bg-gray-700 rounded-lg p-6">
                   <div class="flex flex-col md:flex-row md:items-center">
+                    <!-- Foto de perfil -->
                     <div class="flex-shrink-0 mb-4 md:mb-0 md:mr-6">
                       <div class="w-24 h-24 bg-gray-500 rounded-full overflow-hidden">
-                        <img :src="usuario.foto || 'https://randomuser.me/api/portraits/men/68.jpg'" alt="Foto de perfil" class="w-full h-full object-cover">
+                        <img :src="usuario.foto" alt="Foto de perfil" class="w-full h-full object-cover">
                       </div>
-                      <button class="mt-2 px-3 py-1 bg-blue-600 text-white text-sm rounded hover:bg-blue-700 w-full">
-                        Cambiar foto
-                      </button>
                     </div>
                     
-                    <!-- Aquí usamos nuestro formulario de perfil -->
+                    <!-- Datos del perfil (solo visualización) -->
                     <div class="flex-grow">
-                      <FormularioPerfil 
-                        :usuario="usuario" 
-                        @guardar="guardarPerfil" 
-                        @cancelar="cancelarEdicion"
-                      />
+                      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div>
+                          <h3 class="text-sm font-medium text-gray-400">Nombre</h3>
+                          <p class="text-white">{{ usuario.nombre }} {{ usuario.apellido }}</p>
+                        </div>
+                        <div>
+                          <h3 class="text-sm font-medium text-gray-400">Correo Electrónico</h3>
+                          <p class="text-white">{{ usuario.email }}</p>
+                        </div>
+                        <div>
+                          <h3 class="text-sm font-medium text-gray-400">Teléfono</h3>
+                          <p class="text-white">{{ usuario.telefono }}</p>
+                        </div>
+                        <div>
+                          <h3 class="text-sm font-medium text-gray-400">Fecha de Nacimiento</h3>
+                          <p class="text-white">{{ formatearFecha(usuario.fechaNacimiento) }}</p>
+                        </div>
+                      </div>
                     </div>
                   </div>
                 </div>
               </div>
               
-              <!-- Historial de actividad -->
+              <!-- Historial de actividad (esto lo mantienes igual) -->
               <div class="mb-8">
                 <h3 class="text-xl font-semibold text-white border-b border-gray-600 pb-2 mb-4">Actividad reciente</h3>
                 <div class="bg-gray-700 rounded-lg p-6">
@@ -78,14 +89,10 @@
 </template>
 
 <script>
-import { ref, onMounted } from 'vue';
-import FormularioPerfil from '../components/perfil/FormularioPerfil.vue';
+import { ref } from 'vue';
 
 export default {
   name: 'PerfilPage',
-  components: {
-    FormularioPerfil
-  },
   setup() {
     // Estado del usuario
     const usuario = ref({
@@ -98,48 +105,17 @@ export default {
       foto: 'https://randomuser.me/api/portraits/men/68.jpg'
     });
     
-    // En una aplicación real, cargarías los datos del usuario desde tu API
-    const cargarUsuario = async () => {
-      try {
-        // Simulación de carga de datos
-        // const response = await axios.get('/api/usuario');
-        // usuario.value = response.data;
-      } catch (error) {
-        console.error('Error al cargar los datos del usuario:', error);
-      }
+    // Función para formatear la fecha
+    const formatearFecha = (fecha) => {
+      if (!fecha) return '';
+      
+      const opciones = { year: 'numeric', month: 'long', day: 'numeric' };
+      return new Date(fecha).toLocaleDateString('es-ES', opciones);
     };
-    
-    // Guardar cambios del perfil
-    const guardarPerfil = async (datosActualizados) => {
-      try {
-        // Simulación de guardado
-        // En una aplicación real, harías una llamada a tu API
-        // await axios.put('/api/usuario', datosActualizados);
-        
-        // Actualizar datos locales
-        usuario.value = { ...usuario.value, ...datosActualizados };
-        
-        alert('Perfil actualizado correctamente');
-      } catch (error) {
-        console.error('Error al guardar el perfil:', error);
-        alert('Ocurrió un error al guardar los cambios. Por favor, intenta nuevamente.');
-      }
-    };
-    
-    const cancelarEdicion = () => {
-      // Si es necesario realizar alguna acción al cancelar
-      console.log('Edición cancelada');
-    };
-    
-    // Cargar datos al montar el componente
-    onMounted(() => {
-      cargarUsuario();
-    });
     
     return {
       usuario,
-      guardarPerfil,
-      cancelarEdicion
+      formatearFecha
     };
   }
 };
