@@ -64,9 +64,38 @@ export const useAuthStore = defineStore('auth', {
         axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
         
         return user;
+        
+        /* CÓDIGO PARA BACKEND REAL (descomentar cuando tengas el backend)
+        // const response = await axios.post('/api/auth/login', {
+        //   email: credentials.email,
+        //   password: credentials.password
+        // });
+        // 
+        // const { token, user } = response.data;
+        // 
+        // this.token = token;
+        // this.user = user;
+        // 
+        // if (credentials.remember) {
+        //   localStorage.setItem('auth_token', token);
+        // } else {
+        //   sessionStorage.setItem('auth_token', token);
+        // }
+        // 
+        // // Configurar el token para futuras peticiones
+        // axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
+        // 
+        // return user;
+        */
       } catch (error) {
-        this.error = error.response?.data?.message || 'Error al iniciar sesión';
-        throw new Error(this.error);
+        console.error('Error en login action:', error);
+        this.error = 'Error al iniciar sesión. Por favor intenta nuevamente.';
+        return null; // Devolvemos null en lugar de lanzar un error
+        
+        /* CÓDIGO PARA BACKEND REAL (descomentar cuando tengas el backend)
+        // this.error = error.response?.data?.message || 'Error al iniciar sesión';
+        // throw new Error(this.error);
+        */
       } finally {
         this.loading = false;
       }
@@ -114,8 +143,14 @@ export const useAuthStore = defineStore('auth', {
         
         return user;
       } catch (error) {
-        this.error = error.response?.data?.message || 'Error al registrarse';
-        throw new Error(this.error);
+        console.error('Error en registro:', error);
+        this.error = 'Error al registrarse. Por favor, intenta nuevamente.';
+        return null;
+        
+        /* CÓDIGO PARA BACKEND REAL (descomentar cuando tengas el backend) 
+        // this.error = error.response?.data?.message || 'Error al registrarse';
+        // throw new Error(this.error);
+        */
       } finally {
         this.loading = false;
       }
@@ -149,10 +184,22 @@ export const useAuthStore = defineStore('auth', {
         
         this.user = response.data.user;
         return this.user;
+        
+        /* CÓDIGO PARA BACKEND REAL (descomentar cuando tengas el backend)
+        // const response = await axios.get('/api/auth/me');
+        // this.user = response.data.user;
+        // return this.user;
+        */
       } catch (error) {
         // Si hay un error, probablemente el token es inválido
+        console.error('Error al obtener usuario:', error);
         this.logout();
-        throw new Error('Sesión expirada. Por favor inicia sesión nuevamente.');
+        return null;
+        
+        /* CÓDIGO PARA BACKEND REAL (descomentar cuando tengas el backend)
+        // this.logout();
+        // throw new Error('Sesión expirada. Por favor inicia sesión nuevamente.');
+        */
       } finally {
         this.loading = false;
       }
@@ -169,10 +216,21 @@ export const useAuthStore = defineStore('auth', {
         await new Promise(resolve => setTimeout(resolve, 800));
         
         return true;
+        
+        /* CÓDIGO PARA BACKEND REAL (descomentar cuando tengas el backend)
+        // await axios.post('/api/auth/forgot-password', { email });
+        // return true;
+        */
       } catch (error) {
-        this.error = error.response?.data?.message || 
-                    'Ocurrió un error al procesar tu solicitud. Por favor, intenta de nuevo.';
-        throw new Error(this.error);
+        console.error('Error al solicitar recuperación de contraseña:', error);
+        this.error = 'Error al procesar tu solicitud. Por favor, intenta nuevamente.';
+        return false;
+        
+        /* CÓDIGO PARA BACKEND REAL (descomentar cuando tengas el backend)
+        // this.error = error.response?.data?.message || 
+        //            'Ocurrió un error al procesar tu solicitud. Por favor, intenta de nuevo.';
+        // throw new Error(this.error);
+        */
       } finally {
         this.loading = false;
       }
@@ -184,6 +242,8 @@ export const useAuthStore = defineStore('auth', {
       
       localStorage.removeItem('auth_token');
       sessionStorage.removeItem('auth_token');
+      localStorage.removeItem('user');
+      sessionStorage.removeItem('user');
       
       delete axios.defaults.headers.common['Authorization'];
     }
