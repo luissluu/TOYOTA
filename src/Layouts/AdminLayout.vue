@@ -1,4 +1,4 @@
-// src/layouts/AdminLayout.vue
+//src/layouts/AdminLayout.vue
 <template>
   <div class="relative min-h-screen lg:flex">
     <!-- Barra superior en móvil -->
@@ -137,7 +137,7 @@
 <script>
 import { ref } from 'vue';
 import { useRouter } from 'vue-router';
-import { useAuthStore } from '../stores/auth';
+import { useAuthStore } from '../components/stores/auth';
 
 export default {
   name: 'AdminLayout',
