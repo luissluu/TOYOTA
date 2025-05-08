@@ -1,4 +1,4 @@
-<!-- src/views/auth/Login.vue -->
+<!-- src/views/auth/Login.vue (Corregido) -->
 <template>
   <div class="min-h-screen bg-gray-800 flex flex-col items-center justify-center px-4 py-12">
     <div 
@@ -42,7 +42,7 @@
               </h3>
               
               <!-- Formulario -->
-              <form @submit.prevent="enviarFormulario(handleLogin)" class="space-y-6">
+              <form @submit.prevent="handleLogin" class="space-y-6">
                 <!-- Campo de correo -->
                 <CampoValidado
                   id="email"
@@ -162,8 +162,10 @@ import { useRouter } from 'vue-router';
 import CampoValidado from '../../components/ui/CampoValidado.vue';
 import { validarEmail } from '../../utils/validaciones';
 import { useFormulario } from '../../composables/useFormulario';
+import { useAuthStore } from '../../components/stores/auth'; // Añadida la importación
 
 const router = useRouter();
+const authStore = useAuthStore(); // Aseguramos que se use la store
 
 // Esquema de validación del formulario
 const esquemaValidacion = {
@@ -202,8 +204,7 @@ const {
   validarCampo,
   validarFormulario,
   alPerderFoco,
-  resetearFormulario,
-  enviarFormulario
+  resetearFormulario
 } = useFormulario(esquemaValidacion, valoresIniciales);
 
 // Función para manejar la validación de un campo
@@ -214,36 +215,31 @@ const validacionCampo = (campo, esValido) => {
 
 // Función para manejar el inicio de sesión
 const handleLogin = async () => {
+  if (!validarFormulario()) {
+    return; // Si el formulario no es válido, detener la ejecución
+  }
+  
   try {
-    // Simular llamada a API
-    await new Promise(resolve => setTimeout(resolve, 1000));
+    cargando.value = true;
+    errorGlobal.value = '';
     
-    // Determinar si es un administrador por el correo electrónico
-    // Por ejemplo, cualquier correo que contenga "admin" será un administrador
-    const isAdmin = formulario.email.toLowerCase().includes('admin');
-    
-    // Credenciales para guardar en localStorage/sessionStorage
-    const userData = {
-      name: isAdmin ? 'Administrador' : 'Usuario Toyota',
+    const result = await authStore.login({
       email: formulario.email,
-      role: isAdmin ? 'admin' : 'user'
-    };
+      password: formulario.password,
+      remember: formulario.recordarme
+    });
     
-    // Almacenar token y usuario
-    const storage = formulario.recordarme ? localStorage : sessionStorage;
-    storage.setItem('auth_token', 'ejemplo-token-' + Math.random().toString(36).substring(2));
-    storage.setItem('user', JSON.stringify(userData));
-    
-    // Actualizar el store
-    const authStore = useAuthStore();
-    authStore.user = userData;
-    
-    // Redirigir según el rol
-    router.push(isAdmin ? '/admin' : '/Home');
-    
-    return true;
+    if (result) {
+      // Redirigir según el rol
+      router.push(authStore.isAdmin ? '/admin' : '/Home');
+    } else {
+      errorGlobal.value = 'Error al iniciar sesión. Verifica tus credenciales.';
+    }
   } catch (error) {
-    throw new Error('Credenciales incorrectas. Por favor, verifica tu correo y contraseña.');
+    console.error('Error en inicio de sesión:', error);
+    errorGlobal.value = error.message || 'Error al iniciar sesión. Verifica tus credenciales.';
+  } finally {
+    cargando.value = false;
   }
 };
 </script>

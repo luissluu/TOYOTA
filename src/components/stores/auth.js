@@ -1,11 +1,11 @@
-// src/stores/auth.js
+// src/components/stores/auth.js (Corregido)
 import { defineStore } from 'pinia';
 import axios from 'axios';
 
 export const useAuthStore = defineStore('auth', {
   state: () => ({
-    user: null,
-    token: localStorage.getItem('auth_token'),
+    user: JSON.parse(localStorage.getItem('user') || sessionStorage.getItem('user') || 'null'),
+    token: localStorage.getItem('auth_token') || sessionStorage.getItem('auth_token') || null,
     loading: false,
     error: null
   }),
@@ -23,6 +23,7 @@ export const useAuthStore = defineStore('auth', {
       this.error = null;
       
       try {
+        console.log('Iniciando login con credenciales:', credentials);
         // Para desarrollo/pruebas - simular login exitoso
         
         // Verificar si es admin (para pruebas, puede usar un correo específico)
@@ -55,47 +56,23 @@ export const useAuthStore = defineStore('auth', {
         if (credentials.remember) {
           localStorage.setItem('auth_token', token);
           localStorage.setItem('user', JSON.stringify(user));
+          console.log('Guardando en localStorage:', { token, user });
         } else {
           sessionStorage.setItem('auth_token', token);
           sessionStorage.setItem('user', JSON.stringify(user));
+          console.log('Guardando en sessionStorage:', { token, user });
         }
         
         // Configurar el token para futuras peticiones
         axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
         
+        console.log('Login exitoso:', user);
         return user;
         
-        /* CÓDIGO PARA BACKEND REAL (descomentar cuando tengas el backend)
-        // const response = await axios.post('/api/auth/login', {
-        //   email: credentials.email,
-        //   password: credentials.password
-        // });
-        // 
-        // const { token, user } = response.data;
-        // 
-        // this.token = token;
-        // this.user = user;
-        // 
-        // if (credentials.remember) {
-        //   localStorage.setItem('auth_token', token);
-        // } else {
-        //   sessionStorage.setItem('auth_token', token);
-        // }
-        // 
-        // // Configurar el token para futuras peticiones
-        // axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
-        // 
-        // return user;
-        */
       } catch (error) {
         console.error('Error en login action:', error);
         this.error = 'Error al iniciar sesión. Por favor intenta nuevamente.';
         return null; // Devolvemos null en lugar de lanzar un error
-        
-        /* CÓDIGO PARA BACKEND REAL (descomentar cuando tengas el backend)
-        // this.error = error.response?.data?.message || 'Error al iniciar sesión';
-        // throw new Error(this.error);
-        */
       } finally {
         this.loading = false;
       }
@@ -127,16 +104,13 @@ export const useAuthStore = defineStore('auth', {
         // Usar esta simulación en lugar de la llamada real a API
         const response = mockResponse;
         
-        /* Código para producción - conéctate a tu API real
-        const response = await axios.post('/api/auth/register', userData);
-        */
-        
         const { token, user } = response.data;
         
         this.token = token;
         this.user = user;
         
         localStorage.setItem('auth_token', token);
+        localStorage.setItem('user', JSON.stringify(user));
         
         // Configurar el token para futuras peticiones
         axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
@@ -146,11 +120,6 @@ export const useAuthStore = defineStore('auth', {
         console.error('Error en registro:', error);
         this.error = 'Error al registrarse. Por favor, intenta nuevamente.';
         return null;
-        
-        /* CÓDIGO PARA BACKEND REAL (descomentar cuando tengas el backend) 
-        // this.error = error.response?.data?.message || 'Error al registrarse';
-        // throw new Error(this.error);
-        */
       } finally {
         this.loading = false;
       }
@@ -164,42 +133,47 @@ export const useAuthStore = defineStore('auth', {
       
       try {
         // Para desarrollo/pruebas - simular obtención de usuario
-        
-        // Simulación de respuesta exitosa
-        const mockResponse = {
-          data: {
-            user: {
-              id: '1',
-              name: 'Usuario de Prueba',
-              email: 'usuario@ejemplo.com',
-              role: 'user'
+        if (!this.user) {
+          // Intentar recuperar el usuario del almacenamiento
+          const userStr = localStorage.getItem('user') || sessionStorage.getItem('user');
+          if (userStr) {
+            try {
+              this.user = JSON.parse(userStr);
+              return this.user;
+            } catch (e) {
+              console.error('Error al parsear usuario almacenado:', e);
             }
           }
-        };
+        }
         
-        // Simular delay de red
-        await new Promise(resolve => setTimeout(resolve, 500));
+        // Si no tenemos usuario almacenado, simulamos obtenerlo
+        if (!this.user) {
+          // Simulación de respuesta exitosa
+          const mockResponse = {
+            data: {
+              user: {
+                id: '1',
+                name: 'Usuario de Prueba',
+                email: 'usuario@ejemplo.com',
+                role: 'user'
+              }
+            }
+          };
+          
+          // Simular delay de red
+          await new Promise(resolve => setTimeout(resolve, 500));
+          
+          const response = mockResponse;
+          
+          this.user = response.data.user;
+        }
         
-        const response = mockResponse;
-        
-        this.user = response.data.user;
         return this.user;
-        
-        /* CÓDIGO PARA BACKEND REAL (descomentar cuando tengas el backend)
-        // const response = await axios.get('/api/auth/me');
-        // this.user = response.data.user;
-        // return this.user;
-        */
       } catch (error) {
         // Si hay un error, probablemente el token es inválido
         console.error('Error al obtener usuario:', error);
         this.logout();
         return null;
-        
-        /* CÓDIGO PARA BACKEND REAL (descomentar cuando tengas el backend)
-        // this.logout();
-        // throw new Error('Sesión expirada. Por favor inicia sesión nuevamente.');
-        */
       } finally {
         this.loading = false;
       }
@@ -216,21 +190,10 @@ export const useAuthStore = defineStore('auth', {
         await new Promise(resolve => setTimeout(resolve, 800));
         
         return true;
-        
-        /* CÓDIGO PARA BACKEND REAL (descomentar cuando tengas el backend)
-        // await axios.post('/api/auth/forgot-password', { email });
-        // return true;
-        */
       } catch (error) {
         console.error('Error al solicitar recuperación de contraseña:', error);
         this.error = 'Error al procesar tu solicitud. Por favor, intenta nuevamente.';
         return false;
-        
-        /* CÓDIGO PARA BACKEND REAL (descomentar cuando tengas el backend)
-        // this.error = error.response?.data?.message || 
-        //            'Ocurrió un error al procesar tu solicitud. Por favor, intenta de nuevo.';
-        // throw new Error(this.error);
-        */
       } finally {
         this.loading = false;
       }
@@ -241,8 +204,8 @@ export const useAuthStore = defineStore('auth', {
       this.token = null;
       
       localStorage.removeItem('auth_token');
-      sessionStorage.removeItem('auth_token');
       localStorage.removeItem('user');
+      sessionStorage.removeItem('auth_token');
       sessionStorage.removeItem('user');
       
       delete axios.defaults.headers.common['Authorization'];
