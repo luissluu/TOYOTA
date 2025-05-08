@@ -8,6 +8,7 @@ import Configuracion from '../views/Configuracion.vue'
 import Perfil from '../views/Perfil.vue'
 import Servicios from '../views/Servicios.vue'
 import Historial from '../views/Historial.vue'
+import AdminHome from '../views/admin/AdminHome.vue'
 
 // Guardias de navegación para proteger rutas
 const requireAuth = (to, from, next) => {
@@ -75,6 +76,14 @@ const routes = [
     name: 'Perfil',
     component: Perfil,
     meta: { requiresAuth: true }
+  },
+
+  //Rutas administrador
+  {
+    path: '/AdminHome',
+    name: 'HomeAdmin',
+    component:AdminHome,
+    meta: {requireAuth:true}
   },
   
   // Ruta para manejar páginas no encontradas
