@@ -215,18 +215,31 @@ const validacionCampo = (campo, esValido) => {
 // Función para manejar el inicio de sesión
 const handleLogin = async () => {
   try {
-    // Simular llamada a API (en un entorno real, esto sería una petición a tu backend)
+    // Simular llamada a API
     await new Promise(resolve => setTimeout(resolve, 1000));
     
-    // Simular un login exitoso
-    localStorage.setItem('auth_token', 'ejemplo-token-' + Math.random().toString(36).substring(2));
-    localStorage.setItem('user', JSON.stringify({
-      name: 'Usuario Toyota',
-      email: formulario.email
-    }));
+    // Determinar si es un administrador por el correo electrónico
+    // Por ejemplo, cualquier correo que contenga "admin" será un administrador
+    const isAdmin = formulario.email.toLowerCase().includes('admin');
     
-    // Redirigir al dashboard o página principal
-    router.push('/Home');
+    // Credenciales para guardar en localStorage/sessionStorage
+    const userData = {
+      name: isAdmin ? 'Administrador' : 'Usuario Toyota',
+      email: formulario.email,
+      role: isAdmin ? 'admin' : 'user'
+    };
+    
+    // Almacenar token y usuario
+    const storage = formulario.recordarme ? localStorage : sessionStorage;
+    storage.setItem('auth_token', 'ejemplo-token-' + Math.random().toString(36).substring(2));
+    storage.setItem('user', JSON.stringify(userData));
+    
+    // Actualizar el store
+    const authStore = useAuthStore();
+    authStore.user = userData;
+    
+    // Redirigir según el rol
+    router.push(isAdmin ? '/admin' : '/Home');
     
     return true;
   } catch (error) {

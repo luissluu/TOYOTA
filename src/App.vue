@@ -5,6 +5,12 @@
         <router-view></router-view>
     </div>
 
+        <!-- Diseño de administrador -->
+        <div v-else-if="isAdminRoute">
+        <!-- Mostrar la vista del administrador -->
+        <router-view></router-view>
+    </div>
+
     <!-- Diseño principal con barra lateral y superior -->
     <div v-else class="relative min-h-screen lg:flex">
         <!-- Barra superior en móvil -->
@@ -262,6 +268,11 @@ export default {
         isAuthRoute() {
             // Lista de rutas de autenticación
             return this.$route.meta.layout === 'auth';
+        },
+        // Detectar si estamos en una ruta de administrador
+        isAdminRoute() {
+            // Verifica si la ruta actual comienza con '/admin'
+            return this.$route.path.startsWith('/admin');
         }
     },
     methods: {
@@ -271,10 +282,12 @@ export default {
             localStorage.removeItem('auth_token');
             localStorage.removeItem('user');
             sessionStorage.removeItem('auth_token');
+            sessionStorage.removeItem('user');
             
             // 2. Redirigir al login
             this.$router.push('/login');
         },
+
         
         // Métodos existentes...
         verifyCurrentPassword() {

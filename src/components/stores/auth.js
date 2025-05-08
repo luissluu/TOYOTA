@@ -13,7 +13,9 @@ export const useAuthStore = defineStore('auth', {
   
   getters: {
     isAuthenticated: (state) => !!state.token,
-    isLoading: (state) => state.loading
+    isLoading: (state) => state.loading,
+    isAdmin: (state) => state.user?.role === 'admin',
+    userRole: (state) => state.user?.role || 'user'
   },
   
   actions: {
@@ -23,17 +25,19 @@ export const useAuthStore = defineStore('auth', {
       
       try {
         // Para desarrollo/pruebas - simular login exitoso
-        // En producción, descomenta el código de axios y conecta con tu backend real
+        
+        // Verificar si es admin (para pruebas, puede usar un correo específico)
+        const isAdmin = credentials.email.includes('admin@');
         
         // Simulación de respuesta exitosa
         const mockResponse = {
           data: {
-            token: 'mock-jwt-token',
+            token: 'mock-jwt-token-' + Math.random().toString(36).substring(2),
             user: {
               id: '1',
-              name: 'Usuario de Prueba',
+              name: isAdmin ? 'Administrador' : 'Usuario de Prueba',
               email: credentials.email,
-              role: 'user'
+              role: isAdmin ? 'admin' : 'user'
             }
           }
         };
@@ -44,13 +48,6 @@ export const useAuthStore = defineStore('auth', {
         // Usar esta simulación en lugar de la llamada real a API
         const response = mockResponse;
         
-        /* Código para producción - conéctate a tu API real
-        const response = await axios.post('/api/auth/login', {
-          email: credentials.email,
-          password: credentials.password
-        });
-        */
-        
         const { token, user } = response.data;
         
         this.token = token;
@@ -58,8 +55,10 @@ export const useAuthStore = defineStore('auth', {
         
         if (credentials.remember) {
           localStorage.setItem('auth_token', token);
+          localStorage.setItem('user', JSON.stringify(user));
         } else {
           sessionStorage.setItem('auth_token', token);
+          sessionStorage.setItem('user', JSON.stringify(user));
         }
         
         // Configurar el token para futuras peticiones
