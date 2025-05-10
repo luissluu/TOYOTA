@@ -1,13 +1,15 @@
 const mssql = require("mssql");
 
 const connectionSettings = {
-    server: "localhost",
-    database: "Toyota",
-    user: "sebas",
-    password: "sebas",
+    server: "woinix.database.windows.net",
+    database: "ToyotaDB",
+    user: "seb07",
+    password: 'ElbichoSiu"',
     options: {
         encrypt: true,
-        trustServerCertificate: true
+        trustServerCertificate: false,
+        enableArithAbort: true,
+        connectionTimeout: 30000
     }
 };
 
