@@ -142,8 +142,8 @@ const routes = [
       },
       {
         path: 'servicios',
-        name: 'AdminServicios',
-        component: () => import('../views/admin/AdminServicios.vue')
+        name: 'AdminHistorialServ',
+        component: () => import('../views/admin/AdminHistorialServ.vue')
       },
       {
         path: 'reportes',
