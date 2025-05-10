@@ -13,6 +13,8 @@ import AdminLayout from '../Layouts/AdminLayout.vue'
 
 // Admin views
 import AdminHome from '../views/admin/AdminHome.vue'
+import AdminPerfil from '../views/admin/AdminPerfil.vue'
+import AdminCambiarContrasena from '../views/admin/AdminCambiarContrasena.vue'
 // Importa aquí las demás vistas de administrador a medida que las crees
 
 // Importamos la tienda de autenticación
@@ -128,12 +130,22 @@ const routes = [
   {
     path: '/admin',
     component: AdminLayout,
-    beforeEnter: requireAdmin,
+    beforeEnter: requireAuth,
     children: [
       {
         path: '',
         name: 'AdminHome',
         component: AdminHome
+      },
+      {
+        path: 'perfil',
+        name: 'AdminPerfil',
+        component: AdminPerfil
+      },
+      {
+        path: 'cambiar-contrasena',
+        name: 'AdminCambiarContrasena',
+        component: AdminCambiarContrasena
       },
       {
         path: 'usuarios',
@@ -147,8 +159,8 @@ const routes = [
       },
       {
         path: 'reportes',
-        name: 'AdminReportes',
-        component: () => import('../views/admin/AdminReportes.vue')
+        name: 'AdminInventario',
+        component: () => import('../views/admin/AdminInventario.vue')
       },
       {
         path: 'configuracion',

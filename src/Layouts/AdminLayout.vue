@@ -104,8 +104,8 @@
               leave-to-class="transform scale-95 opacity-0"
             >
               <div class="absolute right-0 z-50 w-56 p-2 bg-white border rounded-lg top-16 lg:top-20" v-show="dropdownOpen">
-                <div class="block px-4 py-2 text-gray-800 transition-colors duration-300 rounded-lg cursor-pointer hover:bg-gray-100">Perfil de Administrador</div>
-                <div class="px-4 py-2 text-gray-800 transition-colors duration-300 rounded-lg cursor-pointer hover:bg-gray-100">Configuración</div>
+                <router-link to="/admin/perfil" class="block px-4 py-2 text-gray-800 transition-colors duration-300 rounded-lg cursor-pointer hover:bg-gray-100">Perfil de Administrador</router-link>
+                <router-link to="/admin/cambiar-contrasena" class="block px-4 py-2 text-gray-800 transition-colors duration-300 rounded-lg cursor-pointer hover:bg-gray-100">Restablecer Contraseña</router-link>
               </div>
             </transition>
           </div>

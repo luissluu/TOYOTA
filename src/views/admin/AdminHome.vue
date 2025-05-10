@@ -1,11 +1,14 @@
 <template>
     <div class="flex flex-col w-full px-6">
-      <section class="grid grid-cols-1 gap-8 px-8 md:grid-cols-1 lg:grid-cols-3">
-        <!-- Título del panel y sección de bienvenida -->
+      <!-- Encabezado del Dashboard -->
+      <div class="mb-8">
+        <h1 class="text-3xl font-bold text-white">Dashboard Administrativo</h1>
+        <p class="text-gray-400 mt-2">Bienvenido al panel de control. Aquí puedes ver un resumen de las operaciones.</p>
+      </div>
 
-  
+      <section class="grid grid-cols-1 gap-8 px-8 md:grid-cols-1 lg:grid-cols-3">
         <!-- Tarjetas de estadísticas rápidas -->
-        <div class="bg-gray-800 p-6 rounded-lg shadow-sm lg:col-span-1">
+        <div class="bg-gray-800 p-6 rounded-lg shadow-lg lg:col-span-1 hover:bg-gray-750 transition-colors duration-200">
           <div class="flex items-center">
             <div class="flex-shrink-0 bg-blue-500 rounded-md p-3">
               <svg class="h-6 w-6 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -15,12 +18,17 @@
             <div class="ml-5">
               <p class="text-sm font-medium text-gray-300">Clientes Totales</p>
               <p class="text-3xl font-semibold text-white">385</p>
-              <p class="text-sm text-green-400">+12% este mes</p>
+              <div class="flex items-center mt-1">
+                <svg class="h-4 w-4 text-green-400" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" />
+                </svg>
+                <p class="text-sm text-green-400 ml-1">+12% este mes</p>
+              </div>
             </div>
           </div>
         </div>
   
-        <div class="bg-gray-800 p-6 rounded-lg shadow-sm lg:col-span-1">
+        <div class="bg-gray-800 p-6 rounded-lg shadow-lg lg:col-span-1 hover:bg-gray-750 transition-colors duration-200">
           <div class="flex items-center">
             <div class="flex-shrink-0 bg-red-600 rounded-md p-3">
               <svg class="h-6 w-6 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -30,12 +38,17 @@
             <div class="ml-5">
               <p class="text-sm font-medium text-gray-300">Ingresos Mensuales</p>
               <p class="text-3xl font-semibold text-white">$48,250</p>
-              <p class="text-sm text-green-400">+8.2% vs último mes</p>
+              <div class="flex items-center mt-1">
+                <svg class="h-4 w-4 text-green-400" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" />
+                </svg>
+                <p class="text-sm text-green-400 ml-1">+8.2% vs último mes</p>
+              </div>
             </div>
           </div>
         </div>
   
-        <div class="bg-gray-800 p-6 rounded-lg shadow-sm lg:col-span-1">
+        <div class="bg-gray-800 p-6 rounded-lg shadow-lg lg:col-span-1 hover:bg-gray-750 transition-colors duration-200">
           <div class="flex items-center">
             <div class="flex-shrink-0 bg-green-500 rounded-md p-3">
               <svg class="h-6 w-6 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -45,18 +58,26 @@
             <div class="ml-5">
               <p class="text-sm font-medium text-gray-300">Servicios Completados</p>
               <p class="text-3xl font-semibold text-white">267</p>
-              <p class="text-sm text-green-400">+5% este mes</p>
+              <div class="flex items-center mt-1">
+                <svg class="h-4 w-4 text-green-400" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" />
+                </svg>
+                <p class="text-sm text-green-400 ml-1">+5% este mes</p>
+              </div>
             </div>
           </div>
         </div>
   
         <!-- Gráfico principal: Servicios por popularidad -->
         <div class="bg-gray-800 p-6 rounded-lg shadow-lg lg:col-span-2">
-          <div class="flex items-center justify-between mb-4">
-            <h2 class="text-xl font-bold text-white">Servicios Más Populares</h2>
+          <div class="flex items-center justify-between mb-6">
+            <div>
+              <h2 class="text-xl font-bold text-white">Servicios Más Populares</h2>
+              <p class="text-sm text-gray-400 mt-1">Distribución de servicios por tipo</p>
+            </div>
             <div class="flex space-x-2">
-              <button class="px-3 py-1 text-sm bg-blue-600 text-white rounded-md">Este Mes</button>
-              <button class="px-3 py-1 text-sm bg-gray-700 text-gray-300 rounded-md hover:bg-gray-600">Este Año</button>
+              <button class="px-4 py-2 text-sm bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors duration-200">Este Mes</button>
+              <button class="px-4 py-2 text-sm bg-gray-700 text-gray-300 rounded-md hover:bg-gray-600 transition-colors duration-200">Este Año</button>
             </div>
           </div>
           
@@ -68,47 +89,92 @@
   
         <!-- Tabla de servicios recientes -->
         <div class="bg-gray-800 p-6 rounded-lg shadow-lg lg:col-span-1">
-          <div class="flex items-center justify-between mb-4">
-            <h2 class="text-xl font-bold text-white">Servicios Recientes</h2>
-            <button class="text-sm text-blue-400 hover:text-blue-300">Ver Todos</button>
+          <div class="flex items-center justify-between mb-6">
+            <div>
+              <h2 class="text-xl font-bold text-white">Servicios Recientes</h2>
+              <p class="text-sm text-gray-400 mt-1">Últimos servicios registrados</p>
+            </div>
+            <button class="text-sm text-blue-400 hover:text-blue-300 transition-colors duration-200">Ver Todos</button>
           </div>
           
-          <div class="mt-4 space-y-3">
-            <div class="bg-gray-700 p-3 rounded-md">
-              <div class="flex justify-between">
+          <div class="mt-4 space-y-4">
+            <div class="bg-gray-700 p-4 rounded-lg hover:bg-gray-650 transition-colors duration-200">
+              <div class="flex justify-between items-start">
                 <div>
                   <p class="text-white font-medium">Cambio de aceite y filtro</p>
-                  <p class="text-sm text-gray-400">Cliente: Juan Pérez</p>
+                  <div class="flex items-center mt-1">
+                    <img class="h-6 w-6 rounded-full" src="https://ui-avatars.com/api/?name=Juan+Perez&background=random" alt="Juan Pérez">
+                    <p class="text-sm text-gray-400 ml-2">Juan Pérez</p>
+                  </div>
                 </div>
-                <span class="px-2 py-1 text-xs bg-green-800 text-green-100 rounded-full">Completado</span>
+                <span class="px-3 py-1 text-xs bg-green-800 text-green-100 rounded-full">Completado</span>
               </div>
-              <p class="text-xs text-gray-400 mt-2">Hace 2 horas</p>
+              <div class="flex items-center mt-3 text-sm text-gray-400">
+                <svg class="h-4 w-4 mr-1" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+                Hace 2 horas
+              </div>
             </div>
             
-            <div class="bg-gray-700 p-3 rounded-md">
-              <div class="flex justify-between">
+            <div class="bg-gray-700 p-4 rounded-lg hover:bg-gray-650 transition-colors duration-200">
+              <div class="flex justify-between items-start">
                 <div>
                   <p class="text-white font-medium">Alineación y balanceo</p>
-                  <p class="text-sm text-gray-400">Cliente: María García</p>
+                  <div class="flex items-center mt-1">
+                    <img class="h-6 w-6 rounded-full" src="https://ui-avatars.com/api/?name=Maria+Garcia&background=random" alt="María García">
+                    <p class="text-sm text-gray-400 ml-2">María García</p>
+                  </div>
                 </div>
-                <span class="px-2 py-1 text-xs bg-yellow-800 text-yellow-100 rounded-full">En proceso</span>
+                <span class="px-3 py-1 text-xs bg-yellow-800 text-yellow-100 rounded-full">En proceso</span>
               </div>
-              <p class="text-xs text-gray-400 mt-2">Hace 4 horas</p>
+              <div class="flex items-center mt-3 text-sm text-gray-400">
+                <svg class="h-4 w-4 mr-1" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+                Hace 4 horas
+              </div>
             </div>
             
-            <div class="bg-gray-700 p-3 rounded-md">
-              <div class="flex justify-between">
+            <div class="bg-gray-700 p-4 rounded-lg hover:bg-gray-650 transition-colors duration-200">
+              <div class="flex justify-between items-start">
                 <div>
                   <p class="text-white font-medium">Diagnóstico sistema eléctrico</p>
-                  <p class="text-sm text-gray-400">Cliente: Roberto López</p>
+                  <div class="flex items-center mt-1">
+                    <img class="h-6 w-6 rounded-full" src="https://ui-avatars.com/api/?name=Roberto+Lopez&background=random" alt="Roberto López">
+                    <p class="text-sm text-gray-400 ml-2">Roberto López</p>
+                  </div>
                 </div>
-                <span class="px-2 py-1 text-xs bg-blue-800 text-blue-100 rounded-full">Programado</span>
+                <span class="px-3 py-1 text-xs bg-blue-800 text-blue-100 rounded-full">Programado</span>
               </div>
-              <p class="text-xs text-gray-400 mt-2">Para hoy, 16:00</p>
+              <div class="flex items-center mt-3 text-sm text-gray-400">
+                <svg class="h-4 w-4 mr-1" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+                Para hoy, 16:00
+              </div>
             </div>
           </div>
         </div>
   
+        <!-- Gráfico de ingresos por categoría -->
+        <div class="bg-gray-800 p-6 rounded-lg shadow-lg lg:col-span-3">
+          <div class="flex items-center justify-between mb-6">
+            <div>
+              <h2 class="text-xl font-bold text-white">Ingresos por Categoría</h2>
+              <p class="text-sm text-gray-400 mt-1">Tendencia de ingresos por tipo de servicio</p>
+            </div>
+            <div class="flex space-x-2">
+              <button class="px-4 py-2 text-sm bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors duration-200">6 Meses</button>
+              <button class="px-4 py-2 text-sm bg-gray-700 text-gray-300 rounded-md hover:bg-gray-600 transition-colors duration-200">1 Año</button>
+            </div>
+          </div>
+          
+          <!-- Canvas del gráfico -->
+          <div class="mt-4" style="height: 350px;">
+            <canvas id="ingresosCategoriaChart" ref="ingresosCategoriaChart"></canvas>
+          </div>
+        </div>
       </section>
     </div>
   </template>
@@ -318,3 +384,12 @@
     }
   };
   </script>
+
+  <style>
+  .bg-gray-750 {
+    background-color: #2d3748;
+  }
+  .bg-gray-650 {
+    background-color: #2d3748;
+  }
+  </style>
