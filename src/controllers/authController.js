@@ -217,7 +217,7 @@ const resetPassword = async (req, res) => {
 const verifyPassword = async (req, res) => {
     try {
         const { currentPassword } = req.body;
-        const usuario_id = req.user.id; // Asumiendo que el middleware de autenticación agrega el usuario a req.user
+        const usuario_id = req.usuario.id; // Asumiendo que el middleware de autenticación agrega el usuario a req.user
 
         const pool = await getConnection();
         
@@ -263,7 +263,7 @@ const verifyPassword = async (req, res) => {
 const changePassword = async (req, res) => {
     try {
         const { currentPassword, newPassword } = req.body;
-        const usuario_id = req.user.id; // Asumiendo que el middleware de autenticación agrega el usuario a req.user
+        const usuario_id = req.usuario.id; // Asumiendo que el middleware de autenticación agrega el usuario a req.user
 
         const pool = await getConnection();
         
