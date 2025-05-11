@@ -2,8 +2,19 @@ const { getConnection, mssql } = require("../config/database");
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 const dotenv = require("dotenv");
+const nodemailer = require("nodemailer");
+const crypto = require("crypto");
 
 dotenv.config();
+
+// Configuración del transporter de nodemailer
+const transporter = nodemailer.createTransport({
+    service: 'gmail',
+    auth: {
+        user: process.env.EMAIL_USER,
+        pass: process.env.EMAIL_PASSWORD
+    }
+});
 
 // Iniciar sesión
 const login = async (req, res) => {
@@ -70,6 +81,120 @@ const login = async (req, res) => {
   }
 };
 
+// Solicitar recuperación de contraseña
+const forgotPassword = async (req, res) => {
+    try {
+        const { correoElectronico } = req.body;
+        const pool = await getConnection();
+
+        // Verificar si el usuario existe
+        const result = await pool
+            .request()
+            .input("correoElectronico", mssql.VarChar, correoElectronico)
+            .query("SELECT usuario_id FROM Usuarios WHERE correoElectronico = @correoElectronico");
+
+        const usuario = result.recordset[0];
+
+        if (!usuario) {
+            return res.status(404).json({ message: "No existe una cuenta con este correo electrónico" });
+        }
+
+        // Generar token de recuperación
+        const resetToken = crypto.randomBytes(32).toString('hex');
+        const resetTokenExpiry = new Date(Date.now() + 3600000); // Token válido por 1 hora
+
+        // Guardar el token en la base de datos
+        await pool
+            .request()
+            .input("usuario_id", mssql.Int, usuario.usuario_id)
+            .input("resetToken", mssql.VarChar, resetToken)
+            .input("resetTokenExpiry", mssql.DateTime, resetTokenExpiry)
+            .query(`
+                UPDATE Usuarios 
+                SET reset_token = @resetToken, 
+                    reset_token_expiry = @resetTokenExpiry 
+                WHERE usuario_id = @usuario_id
+            `);
+
+        // Crear el enlace de recuperación
+        const resetUrl = `${process.env.FRONTEND_URL}/reset-password/${resetToken}`;
+
+        // Configurar el correo electrónico
+        const mailOptions = {
+            from: process.env.EMAIL_USER,
+            to: correoElectronico,
+            subject: 'Recuperación de Contraseña - Toyota Taller Mecánico',
+            html: `
+                <h1>Recuperación de Contraseña</h1>
+                <p>Has solicitado restablecer tu contraseña. Haz clic en el siguiente enlace para crear una nueva contraseña:</p>
+                <a href="${resetUrl}">Restablecer Contraseña</a>
+                <p>Este enlace expirará en 1 hora.</p>
+                <p>Si no solicitaste este cambio, puedes ignorar este correo.</p>
+            `
+        };
+
+        // Enviar el correo electrónico
+        await transporter.sendMail(mailOptions);
+
+        res.json({ message: "Se ha enviado un correo con las instrucciones para recuperar tu contraseña" });
+    } catch (error) {
+        console.error("Error en forgotPassword:", error);
+        res.status(500).json({ message: "Error al procesar la solicitud de recuperación de contraseña" });
+    }
+};
+
+// Restablecer contraseña
+const resetPassword = async (req, res) => {
+    try {
+        const { token, nuevaContraseña } = req.body;
+        const pool = await getConnection();
+
+        // Buscar usuario con el token válido
+        const result = await pool
+            .request()
+            .input("token", mssql.VarChar, token)
+            .input("now", mssql.DateTime, new Date())
+            .query(`
+                SELECT usuario_id 
+                FROM Usuarios 
+                WHERE reset_token = @token 
+                AND reset_token_expiry > @now
+            `);
+
+        const usuario = result.recordset[0];
+
+        if (!usuario) {
+            return res.status(400).json({ 
+                message: "El token de recuperación es inválido o ha expirado" 
+            });
+        }
+
+        // Encriptar la nueva contraseña
+        const salt = await bcrypt.genSalt(10);
+        const hashedPassword = await bcrypt.hash(nuevaContraseña, salt);
+
+        // Actualizar la contraseña y limpiar los tokens
+        await pool
+            .request()
+            .input("usuario_id", mssql.Int, usuario.usuario_id)
+            .input("hashedPassword", mssql.VarChar, hashedPassword)
+            .query(`
+                UPDATE Usuarios 
+                SET contraseña = @hashedPassword,
+                    reset_token = NULL,
+                    reset_token_expiry = NULL
+                WHERE usuario_id = @usuario_id
+            `);
+
+        res.json({ message: "Contraseña actualizada exitosamente" });
+    } catch (error) {
+        console.error("Error en resetPassword:", error);
+        res.status(500).json({ message: "Error al restablecer la contraseña" });
+    }
+};
+
 module.exports = {
-  login
+    login,
+    forgotPassword,
+    resetPassword
 };
