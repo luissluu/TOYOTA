@@ -117,7 +117,7 @@ const forgotPassword = async (req, res) => {
             `);
 
         // Crear el enlace de recuperación
-        const resetUrl = `${process.env.FRONTEND_URL}/restablecer-contrasena/${resetToken}`;
+        const resetUrl = `${process.env.FRONTEND_URL}/reset-password/${resetToken}`;
 
         // Configurar el correo electrónico con mejor estilo y logo
         const mailOptions = {
@@ -134,7 +134,7 @@ const forgotPassword = async (req, res) => {
                     <div style="padding: 32px 24px 24px 24px; text-align: center;">
                       <h2 style="color: #EB0A1E; margin-bottom: 16px;">Recuperación de Contraseña</h2>
                       <p style="color: #333; font-size: 1.1rem; margin-bottom: 24px;">
-                        Hola,<br>Has solicitado restablecer tu contraseña. Haz clic en el siguiente botón para crear una nueva contraseña:
+                        <br>Has solicitado restablecer tu contraseña. Haz clic en el siguiente botón para crear una nueva contraseña:
                       </p>
                       <div style="text-align: center; margin-bottom: 24px;">
                         <a href="${resetUrl}" style="display: inline-block; background: #EB0A1E; color: #fff; padding: 14px 32px; border-radius: 6px; font-size: 1.1rem; text-decoration: none; font-weight: bold;">
