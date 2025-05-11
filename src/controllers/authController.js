@@ -239,11 +239,7 @@ const verifyPassword = async (req, res) => {
         }
 
         // Verificar la contraseña
-        console.log('currentPassword:', currentPassword, typeof currentPassword);
-        console.log('usuario.contraseña:', usuario.contraseña, typeof usuario.contraseña);
-        if (typeof currentPassword !== 'string' || typeof usuario.contraseña !== 'string') {
-            return res.status(400).json({ message: 'Error interno: datos de contraseña inválidos' });
-        }
+       
         const validPassword = await bcrypt.compare(currentPassword, usuario.contraseña);
         
         if (!validPassword) {
@@ -292,6 +288,11 @@ const changePassword = async (req, res) => {
         }
 
         // Verificar la contraseña actual
+        console.log('currentPassword:', currentPassword, typeof currentPassword);
+        console.log('usuario.contraseña:', usuario.contraseña, typeof usuario.contraseña);
+        if (typeof currentPassword !== 'string' || typeof usuario.contraseña !== 'string') {
+            return res.status(400).json({ message: 'Error interno: datos de contraseña inválidos' });
+        }
         const validPassword = await bcrypt.compare(currentPassword, usuario.contraseña);
         
         if (!validPassword) {
