@@ -213,8 +213,113 @@ const resetPassword = async (req, res) => {
     }
 };
 
+// Verificar contraseña actual
+const verifyPassword = async (req, res) => {
+    try {
+        const { currentPassword } = req.body;
+        const usuario_id = req.user.id; // Asumiendo que el middleware de autenticación agrega el usuario a req.user
+
+        const pool = await getConnection();
+        
+        // Obtener la contraseña actual del usuario
+        const result = await pool
+            .request()
+            .input("usuario_id", mssql.Int, usuario_id)
+            .query("SELECT contraseña FROM Usuarios WHERE usuario_id = @usuario_id");
+
+        const usuario = result.recordset[0];
+
+        if (!usuario) {
+            return res.status(404).json({ 
+                success: false,
+                message: "Usuario no encontrado" 
+            });
+        }
+
+        // Verificar la contraseña
+        const validPassword = await bcrypt.compare(currentPassword, usuario.contraseña);
+        
+        if (!validPassword) {
+            return res.status(401).json({ 
+                success: false,
+                message: "Contraseña incorrecta" 
+            });
+        }
+
+        res.json({ 
+            success: true,
+            message: "Contraseña verificada correctamente" 
+        });
+    } catch (error) {
+        console.error("Error en verifyPassword:", error);
+        res.status(500).json({ 
+            success: false,
+            message: "Error al verificar la contraseña" 
+        });
+    }
+};
+
+// Cambiar contraseña
+const changePassword = async (req, res) => {
+    try {
+        const { currentPassword, newPassword } = req.body;
+        const usuario_id = req.user.id; // Asumiendo que el middleware de autenticación agrega el usuario a req.user
+
+        const pool = await getConnection();
+        
+        // Obtener la contraseña actual del usuario
+        const result = await pool
+            .request()
+            .input("usuario_id", mssql.Int, usuario_id)
+            .query("SELECT contraseña FROM Usuarios WHERE usuario_id = @usuario_id");
+
+        const usuario = result.recordset[0];
+
+        if (!usuario) {
+            return res.status(404).json({ 
+                success: false,
+                message: "Usuario no encontrado" 
+            });
+        }
+
+        // Verificar la contraseña actual
+        const validPassword = await bcrypt.compare(currentPassword, usuario.contraseña);
+        
+        if (!validPassword) {
+            return res.status(401).json({ 
+                success: false,
+                message: "Contraseña actual incorrecta" 
+            });
+        }
+
+        // Encriptar la nueva contraseña
+        const salt = await bcrypt.genSalt(10);
+        const hashedPassword = await bcrypt.hash(newPassword, salt);
+
+        // Actualizar la contraseña
+        await pool
+            .request()
+            .input("usuario_id", mssql.Int, usuario_id)
+            .input("hashedPassword", mssql.VarChar, hashedPassword)
+            .query("UPDATE Usuarios SET contraseña = @hashedPassword WHERE usuario_id = @usuario_id");
+
+        res.json({ 
+            success: true,
+            message: "Contraseña actualizada exitosamente" 
+        });
+    } catch (error) {
+        console.error("Error en changePassword:", error);
+        res.status(500).json({ 
+            success: false,
+            message: "Error al cambiar la contraseña" 
+        });
+    }
+};
+
 module.exports = {
     login,
     forgotPassword,
-    resetPassword
+    resetPassword,
+    verifyPassword,
+    changePassword
 };
