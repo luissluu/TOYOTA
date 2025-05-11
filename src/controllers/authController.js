@@ -302,6 +302,10 @@ const changePassword = async (req, res) => {
         }
 
         // Encriptar la nueva contraseña
+        console.log('newPassword:', newPassword, typeof newPassword);
+        if (typeof newPassword !== 'string' || newPassword.length < 8) {
+            return res.status(400).json({ message: 'La nueva contraseña es inválida o demasiado corta' });
+        }
         const salt = await bcrypt.genSalt(10);
         const hashedPassword = await bcrypt.hash(newPassword, salt);
 
