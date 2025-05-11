@@ -216,9 +216,11 @@ const resetPassword = async (req, res) => {
 // Verificar contraseña actual
 const verifyPassword = async (req, res) => {
     try {
+        if (!req.usuario || !req.usuario.id) {
+            return res.status(401).json({ message: 'No autorizado: token inválido o no enviado' });
+        }
         const { currentPassword } = req.body;
-        const usuario_id = req.usuario.id; // Asumiendo que el middleware de autenticación agrega el usuario a req.user
-
+        const usuario_id = req.usuario.id;
         const pool = await getConnection();
         
         // Obtener la contraseña actual del usuario
@@ -262,9 +264,11 @@ const verifyPassword = async (req, res) => {
 // Cambiar contraseña
 const changePassword = async (req, res) => {
     try {
+        if (!req.usuario || !req.usuario.id) {
+            return res.status(401).json({ message: 'No autorizado: token inválido o no enviado' });
+        }
         const { currentPassword, newPassword } = req.body;
-        const usuario_id = req.usuario.id; // Asumiendo que el middleware de autenticación agrega el usuario a req.user
-
+        const usuario_id = req.usuario.id;
         const pool = await getConnection();
         
         // Obtener la contraseña actual del usuario
