@@ -4,6 +4,7 @@ const jwt = require("jsonwebtoken");
 const dotenv = require("dotenv");
 const nodemailer = require("nodemailer");
 const crypto = require("crypto");
+const Usuario = require('../entities/Usuario');
 
 dotenv.config();
 
@@ -330,10 +331,30 @@ const changePassword = async (req, res) => {
     }
 };
 
+const me = async (req, res) => {
+  try {
+    // El middleware pone el usuario decodificado en req.usuario
+    const usuarioId = req.usuario.id;
+    const usuario = await Usuario.findById(usuarioId);
+
+    if (!usuario) {
+      return res.status(404).json({ message: 'Usuario no encontrado' });
+    }
+
+    // No enviar la contraseña
+    if (usuario.contraseña) delete usuario.contraseña;
+
+    res.json(usuario);
+  } catch (error) {
+    res.status(500).json({ message: 'Error al obtener datos del usuario' });
+  }
+};
+
 module.exports = {
     login,
     forgotPassword,
     resetPassword,
     verifyPassword,
-    changePassword
+    changePassword,
+    me
 };
