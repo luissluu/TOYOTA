@@ -26,7 +26,7 @@ class Usuario {
                     VALUES (
                         @rol_id, @nombre, @apellidoPaterno, @apellidoMaterno, 
                         @correoElectronico, @contraseña, @telefono, @direccion, 
-                        @ciudad, @estado_provincia, @codigo_postal
+                        @ciudad, @estado_provincia, @codigo_postal, @fecha_nacimiento
                     );
                     SELECT SCOPE_IDENTITY() AS usuario_id;
                 `);
