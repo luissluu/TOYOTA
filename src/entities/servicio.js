@@ -8,14 +8,27 @@ class Servicio {
                 .input('nombre', mssql.VarChar(100), servicio.nombre)
                 .input('descripcion', mssql.Text, servicio.descripcion)
                 .input('duracion_estimada', mssql.Int, servicio.duracion_estimada)
-                .input('precio_estimado', mssql.Decimal(10,2), servicio.precio_estimado)
+                .input('precio_estimado', mssql.Decimal(10, 2), servicio.precio_estimado)
                 .input('categoria', mssql.VarChar(50), servicio.categoria)
                 .query(`
-                    INSERT INTO Servicios (nombre, descripcion, duracion_estimada, precio_estimado, categoria)
-                    OUTPUT INSERTED.*
-                    VALUES (@nombre, @descripcion, @duracion_estimada, @precio_estimado, @categoria)
+                    INSERT INTO Servicios (
+                        nombre, descripcion, duracion_estimada, 
+                        precio_estimado, categoria
+                    )
+                    VALUES (
+                        @nombre, @descripcion, @duracion_estimada, 
+                        @precio_estimado, @categoria
+                    );
+                    SELECT SCOPE_IDENTITY() AS servicio_id;
                 `);
-            return result.recordset[0];
+            
+            // Obtener el ID del servicio recién creado
+            const servicioId = result.recordset[0].servicio_id;
+            
+            // Obtener el servicio completo
+            const servicioCreado = await this.findById(servicioId);
+            return servicioCreado;
+            
         } catch (error) {
             throw error;
         }
@@ -24,8 +37,7 @@ class Servicio {
     static async findAll() {
         try {
             const pool = await getConnection();
-            const result = await pool.request()
-                .query('SELECT * FROM Servicios');
+            const result = await pool.request().query('SELECT * FROM Servicios');
             return result.recordset;
         } catch (error) {
             throw error;
@@ -64,7 +76,7 @@ class Servicio {
                 .input('nombre', mssql.VarChar(100), servicio.nombre)
                 .input('descripcion', mssql.Text, servicio.descripcion)
                 .input('duracion_estimada', mssql.Int, servicio.duracion_estimada)
-                .input('precio_estimado', mssql.Decimal(10,2), servicio.precio_estimado)
+                .input('precio_estimado', mssql.Decimal(10, 2), servicio.precio_estimado)
                 .input('categoria', mssql.VarChar(50), servicio.categoria)
                 .query(`
                     UPDATE Servicios

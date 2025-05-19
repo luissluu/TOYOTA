@@ -8,6 +8,14 @@ const authRoutes = require('./routes/authRoutes');
 const rolRoutes = require('./routes/rolRoutes');
 const usuarioRoutes = require('./routes/usuarioRoutes');
 const vehiculoRoutes = require('./routes/vehiculoRoutes');
+const serviciosRoutes = require('./routes/serviciosRoutes');
+const inventarioRoutes = require('./routes/inventarioRoutes');
+const citasRoutes = require('./routes/citasRoutes');
+const ordenServicioRoutes = require('./routes/ordenServicioRoutes');
+const detalleOrdenRoutes = require('./routes/detalleOrdenRoutes');
+const pedidoRoutes = require('./routes/pedidoRoutes');
+const detallePedidoRoutes = require('./routes/detallePedidoRoutes');
+const movimientoInventarioRoutes = require('./routes/movimientoInventarioRoutes');
 
 // Cargar variables de entorno
 dotenv.config();
@@ -25,6 +33,14 @@ app.use('/api/auth', authRoutes);
 app.use('/api/roles', rolRoutes);
 app.use('/api/usuarios', usuarioRoutes);
 app.use('/api/vehiculos', vehiculoRoutes);
+app.use('/api/servicios', serviciosRoutes);
+app.use('/api/inventario', inventarioRoutes);
+app.use('/api/citas', citasRoutes);
+app.use('/api/ordenes-servicio', ordenServicioRoutes);
+app.use('/api/detalles-orden', detalleOrdenRoutes);
+app.use('/api/pedidos', pedidoRoutes);
+app.use('/api/detalles-pedido', detallePedidoRoutes);
+app.use('/api/movimientos-inventario', movimientoInventarioRoutes);
 
 // Ruta base
 app.get('/', (req, res) => {
