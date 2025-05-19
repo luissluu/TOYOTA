@@ -14,6 +14,7 @@ class Usuario {
                 .input('telefono', mssql.VarChar(20), usuario.telefono)
                 .input('direccion', mssql.VarChar(255), usuario.direccion)
                 .input('ciudad', mssql.VarChar(100), usuario.ciudad)
+                .input('fecha_nacimiento', mssql.Date, usuario.fecha_nacimiento)
                 .input('estado_provincia', mssql.VarChar(100), usuario.estado_provincia)
                 .input('codigo_postal', mssql.VarChar(20), usuario.codigo_postal)
                 .query(`
