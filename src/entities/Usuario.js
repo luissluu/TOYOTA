@@ -21,7 +21,7 @@ class Usuario {
                     INSERT INTO Usuarios (
                         rol_id, nombre, apellidoPaterno, apellidoMaterno, 
                         correoElectronico, contraseña, telefono, direccion, 
-                        ciudad, estado_provincia, codigo_postal
+                        ciudad, estado_provincia, codigo_postal, fecha_nacimiento
                     )
                     VALUES (
                         @rol_id, @nombre, @apellidoPaterno, @apellidoMaterno, 
