@@ -1,4 +1,4 @@
-const Servicio = require('../entities/ervicio');
+const Servicio = require('../entities/servicio');
 
 // Obtener todos los servicios
 const getAllServicios = async (req, res) => {
