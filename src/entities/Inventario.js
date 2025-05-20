@@ -106,7 +106,6 @@ class Inventario {
                 .input('stock_minimo', mssql.Int, articulo.stock_minimo)
                 .input('stock_maximo', mssql.Int, articulo.stock_maximo)
                 .input('unidad_medida', mssql.VarChar(20), articulo.unidad_medida)
-                .input('ubicacion', mssql.VarChar(50), articulo.ubicacion)
                 .input('precio_compra', mssql.Decimal(10, 2), articulo.precio_compra)
                 .input('precio_venta', mssql.Decimal(10, 2), articulo.precio_venta)
                 .query(`
@@ -122,7 +121,6 @@ class Inventario {
                         stock_minimo = @stock_minimo,
                         stock_maximo = @stock_maximo,
                         unidad_medida = @unidad_medida,
-                        ubicacion = @ubicacion,
                         precio_compra = @precio_compra,
                         precio_venta = @precio_venta,
                         ultima_actualizacion = GETDATE()
