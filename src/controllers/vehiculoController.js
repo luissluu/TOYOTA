@@ -77,7 +77,20 @@ const vehiculoController = {
                 }
             }
 
-            const vehiculo = await Vehiculo.update(req.params.id, req.body);
+            // Obtener el vehículo original
+            const vehiculoOriginal = await Vehiculo.findById(req.params.id);
+            if (!vehiculoOriginal) {
+                return res.status(404).json({ message: 'Vehículo no encontrado' });
+            }
+
+            // Mantener el usuario_id original si no viene en el body
+            const vehiculoData = {
+                ...vehiculoOriginal,
+                ...req.body,
+                usuario_id: vehiculoOriginal.usuario_id
+            };
+
+            const vehiculo = await Vehiculo.update(req.params.id, vehiculoData);
             if (!vehiculo) {
                 return res.status(404).json({
                     message: 'Vehículo no encontrado'
