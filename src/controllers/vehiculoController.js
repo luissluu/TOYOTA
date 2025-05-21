@@ -12,7 +12,13 @@ const vehiculoController = {
                 });
             }
 
-            const vehiculo = await Vehiculo.create(req.body);
+            // Asignar el usuario_id del usuario autenticado
+            const vehiculoData = {
+                ...req.body,
+                usuario_id: req.user.id
+            };
+
+            const vehiculo = await Vehiculo.create(vehiculoData);
             res.status(201).json({
                 message: 'Vehículo creado exitosamente',
                 vehiculo
