@@ -33,7 +33,12 @@ const vehiculoController = {
 
     async getAll(req, res) {
         try {
-            const vehiculos = await Vehiculo.findAll();
+            let vehiculos;
+            if (req.usuario.rol === 'administrador' || req.usuario.rol === 'mecanico') {
+                vehiculos = await Vehiculo.findAll();
+            } else {
+                vehiculos = await Vehiculo.findByUserId(req.usuario.id);
+            }
             res.json(vehiculos);
         } catch (error) {
             res.status(500).json({
