@@ -82,7 +82,7 @@ class Cita {
             const result = await pool.request()
                 .input('usuario_id', mssql.Int, usuarioId)
                 .query(`
-                    SELECT c.*, 
+                    SELECT c.cita_id, c.usuario_id, c.vehiculo_id, c.fecha, c.tipo_servicio, c.descripcion,
                            u.nombre as nombre_usuario, 
                            u.apellidoPaterno as apellido_usuario,
                            v.marca as marca_vehiculo,
@@ -92,7 +92,7 @@ class Cita {
                     INNER JOIN Usuarios u ON c.usuario_id = u.usuario_id
                     INNER JOIN Vehiculos v ON c.vehiculo_id = v.vehiculo_id
                     WHERE c.usuario_id = @usuario_id
-                    ORDER BY c.fecha DESC, c.hora_inicio ASC
+                    ORDER BY c.fecha DESC
                 `);
             return result.recordset;
         } catch (error) {

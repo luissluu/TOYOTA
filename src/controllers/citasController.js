@@ -35,8 +35,8 @@ const getCitasByUsuario = async (req, res) => {
         const citas = await Cita.findByUsuario(req.params.usuarioId);
         res.json(citas);
     } catch (error) {
-        console.error('Error al obtener citas del usuario:', error);
-        res.status(500).json({ error: 'Error al obtener las citas del usuario', detalle: error.message });
+        console.error('Error al obtener citas del usuario:', error, error.stack);
+        res.status(500).json({ error: 'Error al obtener las citas del usuario', detalle: error.message, stack: error.stack });
     }
 };
 
