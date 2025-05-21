@@ -10,6 +10,6 @@ router.get('/:id', authMiddleware, vehiculoController.getById);
 // Rutas protegidas con autenticación y verificación de roles
 router.post('/', authMiddleware, checkRole(['administrador', 'mecanico', 'cliente']), vehiculoController.create);
 router.put('/:id', authMiddleware, checkRole(['administrador', 'mecanico', 'cliente']), vehiculoController.update);
-router.delete('/:id', authMiddleware, checkRole(['administrador']), vehiculoController.delete);
+router.delete('/:id', authMiddleware, checkRole(['administrador', 'mecanico', 'cliente']), vehiculoController.delete);
 
 module.exports = router;
