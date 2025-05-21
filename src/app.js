@@ -25,7 +25,10 @@ dotenv.config();
 const app = express();
 
 // Configurar middlewares
-app.use(cors());
+app.use(cors({
+  origin: ['https://toyota-one.vercel.app', 'http://localhost:3000'],
+  credentials: true
+}));
 app.use(helmet());
 app.use(express.json());
 
