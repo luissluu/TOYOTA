@@ -11,6 +11,7 @@ const {
     updateEstado,
     deleteCita
 } = require('../controllers/citasController');
+const { authMiddleware } = require('../middlewares/authMiddleware');
 
 // Obtener todas las citas
 router.get('/', getAllCitas);
@@ -28,7 +29,7 @@ router.get('/vehiculo/:vehiculoId', getCitasByVehiculo);
 router.get('/fecha/:fecha', getCitasByFecha);
 
 // Crear una nueva cita
-router.post('/', createCita);
+router.post('/', authMiddleware, createCita);
 
 // Actualizar una cita
 router.put('/:id', updateCita);
