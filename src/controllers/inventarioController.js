@@ -60,6 +60,10 @@ const getArticulosByCategoria = async (req, res) => {
 // Crear un nuevo artículo
 const createArticulo = async (req, res) => {
     try {
+        console.log('Datos recibidos en el backend:', req.body);
+        if (!req.body.codigo || !req.body.nombre || !req.body.categoria) {
+            return res.status(400).json({ error: 'Faltan campos obligatorios: codigo, nombre o categoria' });
+        }
         const articulo = await Inventario.create(req.body);
         res.status(201).json(articulo);
     } catch (error) {
@@ -67,7 +71,7 @@ const createArticulo = async (req, res) => {
         if (error.message === 'El código del artículo ya existe') {
             return res.status(400).json({ error: error.message });
         }
-        res.status(500).json({ error: 'Error al crear el artículo' });
+        res.status(500).json({ error: 'Error al crear el artículo', detalle: error.message });
     }
 };
 
