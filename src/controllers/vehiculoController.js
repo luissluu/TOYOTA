@@ -12,7 +12,13 @@ const vehiculoController = {
                 });
             }
 
-            const vehiculo = await Vehiculo.create(req.body);
+            // Agregar el usuario_id del usuario autenticado
+            const vehiculoData = {
+                ...req.body,
+                usuario_id: req.user.id
+            };
+
+            const vehiculo = await Vehiculo.create(vehiculoData);
             res.status(201).json({
                 message: 'Vehículo creado exitosamente',
                 vehiculo
@@ -27,7 +33,18 @@ const vehiculoController = {
 
     async getAll(req, res) {
         try {
-            const vehiculos = await Vehiculo.findAll();
+            // Obtener el ID del usuario del token
+            const userId = req.user.id;
+            
+            // Si es administrador o mecánico, mostrar todos los vehículos
+            // Si es cliente, mostrar solo sus vehículos
+            let vehiculos;
+            if (req.user.rol === 'administrador' || req.user.rol === 'mecanico') {
+                vehiculos = await Vehiculo.findAll();
+            } else {
+                vehiculos = await Vehiculo.findByUserId(userId);
+            }
+            
             res.json(vehiculos);
         } catch (error) {
             res.status(500).json({
