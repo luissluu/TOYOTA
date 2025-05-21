@@ -68,7 +68,12 @@ const getCitasByFecha = async (req, res) => {
 const createCita = async (req, res) => {
     try {
         console.log('Datos recibidos para crear cita:', req.body);
-        const cita = await Cita.create(req.body);
+        // Asignar el usuario_id del usuario autenticado
+        const citaData = {
+            ...req.body,
+            usuario_id: req.usuario.id
+        };
+        const cita = await Cita.create(citaData);
         res.status(201).json(cita);
     } catch (error) {
         console.error('Error al crear cita:', error);
