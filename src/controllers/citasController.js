@@ -73,6 +73,8 @@ const createCita = async (req, res) => {
             ...req.body,
             usuario_id: req.usuario.id
         };
+        // Eliminar cualquier referencia a creado_por si existe
+        delete citaData.creado_por;
         const cita = await Cita.create(citaData);
         res.status(201).json(cita);
     } catch (error) {
