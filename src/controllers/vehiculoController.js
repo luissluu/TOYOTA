@@ -15,7 +15,7 @@ const vehiculoController = {
             // Asignar el usuario_id del usuario autenticado
             const vehiculoData = {
                 ...req.body,
-                usuario_id: req.user.id
+                usuario_id: req.usuario.id
             };
 
             const vehiculo = await Vehiculo.create(vehiculoData);
