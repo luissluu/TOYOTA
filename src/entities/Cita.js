@@ -8,19 +8,14 @@ class Cita {
                 .input('usuario_id', mssql.Int, cita.usuario_id)
                 .input('vehiculo_id', mssql.Int, cita.vehiculo_id)
                 .input('fecha', mssql.Date, cita.fecha)
-                .input('hora_inicio', mssql.Time, cita.hora_inicio)
-                .input('hora_fin', mssql.Time, cita.hora_fin)
                 .input('tipo_servicio', mssql.VarChar(100), cita.tipo_servicio)
-                .input('estado', mssql.VarChar(20), cita.estado || 'programada')
                 .input('descripcion', mssql.Text, cita.descripcion)
                 .query(`
                     INSERT INTO Citas (
-                        usuario_id, vehiculo_id, fecha, hora_inicio, hora_fin,
-                        tipo_servicio, estado, descripcion
+                        usuario_id, vehiculo_id, fecha, tipo_servicio, descripcion
                     )
                     VALUES (
-                        @usuario_id, @vehiculo_id, @fecha, @hora_inicio, @hora_fin,
-                        @tipo_servicio, @estado, @descripcion
+                        @usuario_id, @vehiculo_id, @fecha, @tipo_servicio, @descripcion
                     );
                     SELECT SCOPE_IDENTITY() AS cita_id;
                 `);
@@ -50,7 +45,7 @@ class Cita {
                 FROM Citas c
                 INNER JOIN Usuarios u ON c.usuario_id = u.usuario_id
                 INNER JOIN Vehiculos v ON c.vehiculo_id = v.vehiculo_id
-                ORDER BY c.fecha DESC, c.hora_inicio ASC
+                ORDER BY c.fecha DESC
             `);
             return result.recordset;
         } catch (error) {
@@ -159,18 +154,12 @@ class Cita {
             const result = await pool.request()
                 .input('id', mssql.Int, id)
                 .input('fecha', mssql.Date, cita.fecha)
-                .input('hora_inicio', mssql.Time, cita.hora_inicio)
-                .input('hora_fin', mssql.Time, cita.hora_fin)
                 .input('tipo_servicio', mssql.VarChar(100), cita.tipo_servicio)
-                .input('estado', mssql.VarChar(20), cita.estado)
                 .input('descripcion', mssql.Text, cita.descripcion)
                 .query(`
                     UPDATE Citas
                     SET fecha = @fecha,
-                        hora_inicio = @hora_inicio,
-                        hora_fin = @hora_fin,
                         tipo_servicio = @tipo_servicio,
-                        estado = @estado,
                         descripcion = @descripcion
                     OUTPUT INSERTED.*
                     WHERE cita_id = @id
