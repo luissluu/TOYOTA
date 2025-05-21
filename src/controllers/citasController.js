@@ -31,12 +31,12 @@ const getCitaById = async (req, res) => {
 // Obtener citas por usuario
 const getCitasByUsuario = async (req, res) => {
     try {
-        const { usuarioId } = req.params;
-        const citas = await Cita.findByUsuario(usuarioId);
+        console.log('Buscando citas para usuario:', req.params.usuarioId);
+        const citas = await Cita.findByUsuario(req.params.usuarioId);
         res.json(citas);
     } catch (error) {
         console.error('Error al obtener citas del usuario:', error);
-        res.status(500).json({ error: 'Error al obtener las citas del usuario' });
+        res.status(500).json({ error: 'Error al obtener las citas del usuario', detalle: error.message });
     }
 };
 
