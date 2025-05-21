@@ -67,6 +67,7 @@ const getCitasByFecha = async (req, res) => {
 // Crear una nueva cita
 const createCita = async (req, res) => {
     try {
+        console.log('Datos recibidos para crear cita:', req.body);
         const cita = await Cita.create(req.body);
         res.status(201).json(cita);
     } catch (error) {
@@ -74,7 +75,7 @@ const createCita = async (req, res) => {
         if (error.message === 'El usuario o vehículo especificado no existe') {
             return res.status(400).json({ error: error.message });
         }
-        res.status(500).json({ error: 'Error al crear la cita' });
+        res.status(500).json({ error: 'Error al crear la cita', detalle: error.message });
     }
 };
 
