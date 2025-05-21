@@ -13,15 +13,14 @@ class Cita {
                 .input('tipo_servicio', mssql.VarChar(100), cita.tipo_servicio)
                 .input('estado', mssql.VarChar(20), cita.estado || 'programada')
                 .input('descripcion', mssql.Text, cita.descripcion)
-                .input('creado_por', mssql.Int, cita.creado_por)
                 .query(`
                     INSERT INTO Citas (
                         usuario_id, vehiculo_id, fecha, hora_inicio, hora_fin,
-                        tipo_servicio, estado, descripcion, creado_por
+                        tipo_servicio, estado, descripcion
                     )
                     VALUES (
                         @usuario_id, @vehiculo_id, @fecha, @hora_inicio, @hora_fin,
-                        @tipo_servicio, @estado, @descripcion, @creado_por
+                        @tipo_servicio, @estado, @descripcion
                     );
                     SELECT SCOPE_IDENTITY() AS cita_id;
                 `);
