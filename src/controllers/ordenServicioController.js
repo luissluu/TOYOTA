@@ -35,6 +35,10 @@ const getOrdenesByUsuario = async (req, res) => {
     try {
         const { usuarioId } = req.params;
         const ordenes = await OrdenServicio.findByUsuario(usuarioId);
+        // Agregar los detalles (servicios) a cada orden
+        for (const orden of ordenes) {
+            orden.detalles = await DetalleOrden.findByOrden(orden.orden_id);
+        }
         res.json(ordenes);
     } catch (error) {
         console.error('Error al obtener órdenes del usuario:', error);
