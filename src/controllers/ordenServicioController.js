@@ -204,7 +204,8 @@ const finalizarOrden = async (req, res) => {
             total: ordenActual.total,
             fecha_inicio: ordenActual.fecha_inicio,
             diagnostico: ordenActual.diagnostico,
-            notas: ordenActual.notas
+            notas: ordenActual.notas,
+            cita_id: null
         });
         res.json({ message: 'Orden finalizada correctamente', orden: ordenFinalizada });
     } catch (error) {
