@@ -179,6 +179,34 @@ const deleteOrden = async (req, res) => {
     }
 };
 
+// Finalizar una orden
+const finalizarOrden = async (req, res) => {
+    try {
+        const { id } = req.params;
+        const { usuario_id } = req.body; // usuario que finaliza la orden
+        // Obtener todos los detalles de la orden
+        const detalles = await DetalleOrden.findByOrden(id);
+        if (!detalles.length) {
+            return res.status(400).json({ error: 'La orden no tiene servicios asociados' });
+        }
+        // Verificar que todos los detalles estén completados
+        const incompletos = detalles.filter(d => d.estado !== 'completado');
+        if (incompletos.length > 0) {
+            return res.status(400).json({ error: 'No todos los servicios están completados' });
+        }
+        // Finalizar la orden
+        const ordenFinalizada = await OrdenServicio.update(id, {
+            estado: 'finalizada',
+            fecha_finalizacion: new Date(),
+            finalizada_por: usuario_id
+        });
+        res.json({ message: 'Orden finalizada correctamente', orden: ordenFinalizada });
+    } catch (error) {
+        console.error('Error al finalizar orden:', error);
+        res.status(500).json({ error: 'Error al finalizar la orden' });
+    }
+};
+
 module.exports = {
     getAllOrdenes,
     getOrdenById,
@@ -189,5 +217,6 @@ module.exports = {
     updateOrden,
     updateEstado,
     updateTotal,
-    deleteOrden
+    deleteOrden,
+    finalizarOrden
 }; 

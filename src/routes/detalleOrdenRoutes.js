@@ -32,14 +32,14 @@ router.get('/estado/:estado', getDetallesByEstado);
 // Crear un nuevo detalle
 router.post('/', createDetalle);
 
+// Actualizar estado de un detalle
+router.put('/:id/estado', updateEstadoDetalle);
+
 // Actualizar un detalle
 router.put('/:id', updateDetalle);
 
 // Actualizar mecánico de un detalle
 router.patch('/:id/mecanico', updateMecanico);
-
-// Actualizar estado de un detalle
-router.put('/:id/estado', updateEstadoDetalle);
 
 // Eliminar un detalle
 router.delete('/:id', deleteDetalle);
