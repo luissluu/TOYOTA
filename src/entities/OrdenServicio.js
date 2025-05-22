@@ -49,9 +49,7 @@ class OrdenServicio {
                        v.marca as marca_vehiculo,
                        v.modelo as modelo_vehiculo,
                        v.placa as placa_vehiculo,
-                       c.fecha as fecha_cita,
-                       c.hora_inicio as hora_inicio_cita,
-                       c.hora_fin as hora_fin_cita
+                       c.fecha as fecha_cita
                 FROM Ordenes_Servicio o
                 INNER JOIN Usuarios u ON o.usuario_id = u.usuario_id
                 INNER JOIN Vehiculos v ON o.vehiculo_id = v.vehiculo_id
@@ -76,9 +74,7 @@ class OrdenServicio {
                            v.marca as marca_vehiculo,
                            v.modelo as modelo_vehiculo,
                            v.placa as placa_vehiculo,
-                           c.fecha as fecha_cita,
-                           c.hora_inicio as hora_inicio_cita,
-                           c.hora_fin as hora_fin_cita
+                           c.fecha as fecha_cita
                     FROM Ordenes_Servicio o
                     INNER JOIN Usuarios u ON o.usuario_id = u.usuario_id
                     INNER JOIN Vehiculos v ON o.vehiculo_id = v.vehiculo_id
@@ -103,9 +99,7 @@ class OrdenServicio {
                            v.marca as marca_vehiculo,
                            v.modelo as modelo_vehiculo,
                            v.placa as placa_vehiculo,
-                           c.fecha as fecha_cita,
-                           c.hora_inicio as hora_inicio_cita,
-                           c.hora_fin as hora_fin_cita
+                           c.fecha as fecha_cita
                     FROM Ordenes_Servicio o
                     INNER JOIN Usuarios u ON o.usuario_id = u.usuario_id
                     INNER JOIN Vehiculos v ON o.vehiculo_id = v.vehiculo_id
@@ -131,9 +125,7 @@ class OrdenServicio {
                            v.marca as marca_vehiculo,
                            v.modelo as modelo_vehiculo,
                            v.placa as placa_vehiculo,
-                           c.fecha as fecha_cita,
-                           c.hora_inicio as hora_inicio_cita,
-                           c.hora_fin as hora_fin_cita
+                           c.fecha as fecha_cita
                     FROM Ordenes_Servicio o
                     INNER JOIN Usuarios u ON o.usuario_id = u.usuario_id
                     INNER JOIN Vehiculos v ON o.vehiculo_id = v.vehiculo_id
@@ -159,9 +151,7 @@ class OrdenServicio {
                            v.marca as marca_vehiculo,
                            v.modelo as modelo_vehiculo,
                            v.placa as placa_vehiculo,
-                           c.fecha as fecha_cita,
-                           c.hora_inicio as hora_inicio_cita,
-                           c.hora_fin as hora_fin_cita
+                           c.fecha as fecha_cita
                     FROM Ordenes_Servicio o
                     INNER JOIN Usuarios u ON o.usuario_id = u.usuario_id
                     INNER JOIN Vehiculos v ON o.vehiculo_id = v.vehiculo_id
