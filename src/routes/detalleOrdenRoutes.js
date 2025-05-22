@@ -10,7 +10,8 @@ const {
     updateDetalle,
     updateEstado,
     updateMecanico,
-    deleteDetalle
+    deleteDetalle,
+    updateEstadoDetalle
 } = require('../controllers/detalleOrdenController');
 
 // Obtener todos los detalles
@@ -39,6 +40,9 @@ router.patch('/:id/estado', updateEstado);
 
 // Actualizar mecánico de un detalle
 router.patch('/:id/mecanico', updateMecanico);
+
+// Actualizar estado de un detalle
+router.put('/:id/estado', updateEstadoDetalle);
 
 // Eliminar un detalle
 router.delete('/:id', deleteDetalle);

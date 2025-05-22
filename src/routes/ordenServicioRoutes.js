@@ -10,7 +10,8 @@ const {
     updateOrden,
     updateEstado,
     updateTotal,
-    deleteOrden
+    deleteOrden,
+    finalizarOrden
 } = require('../controllers/ordenServicioController');
 
 // Obtener todas las órdenes
@@ -42,5 +43,8 @@ router.patch('/:id/total', updateTotal);
 
 // Eliminar una orden
 router.delete('/:id', deleteOrden);
+
+// Finalizar una orden
+router.put('/:id/finalizar', finalizarOrden);
 
 module.exports = router; 

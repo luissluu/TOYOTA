@@ -158,6 +158,25 @@ const deleteDetalle = async (req, res) => {
     }
 };
 
+// Nuevo endpoint para actualizar el estado de un detalle
+const updateEstadoDetalle = async (req, res) => {
+    try {
+        const { id } = req.params;
+        const { estado } = req.body;
+        if (!estado) {
+            return res.status(400).json({ error: 'El estado es requerido' });
+        }
+        const detalle = await DetalleOrden.updateEstado(id, estado);
+        if (!detalle) {
+            return res.status(404).json({ error: 'Detalle de orden no encontrado' });
+        }
+        res.json(detalle);
+    } catch (error) {
+        console.error('Error al actualizar estado del detalle:', error);
+        res.status(500).json({ error: 'Error al actualizar el estado del detalle' });
+    }
+};
+
 module.exports = {
     getAllDetalles,
     getDetalleById,
@@ -168,5 +187,6 @@ module.exports = {
     updateDetalle,
     updateEstado,
     updateMecanico,
-    deleteDetalle
+    deleteDetalle,
+    updateEstadoDetalle
 }; 
