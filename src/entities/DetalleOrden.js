@@ -11,15 +11,14 @@ class DetalleOrden {
                 .input('precio', mssql.Decimal(10, 2), detalle.precio)
                 .input('mecanico_id', mssql.Int, detalle.mecanico_id)
                 .input('estado', mssql.VarChar(20), detalle.estado || 'pendiente')
-                .input('horas_trabajo', mssql.Decimal(5, 2), detalle.horas_trabajo)
                 .query(`
                     INSERT INTO Detalles_Orden (
                         orden_id, servicio_id, descripcion, precio,
-                        mecanico_id, estado, horas_trabajo
+                        mecanico_id, estado
                     )
                     VALUES (
                         @orden_id, @servicio_id, @descripcion, @precio,
-                        @mecanico_id, @estado, @horas_trabajo
+                        @mecanico_id, @estado
                     );
                     SELECT SCOPE_IDENTITY() AS detalle_id;
                 `);
@@ -156,14 +155,12 @@ class DetalleOrden {
                 .input('precio', mssql.Decimal(10, 2), detalle.precio)
                 .input('mecanico_id', mssql.Int, detalle.mecanico_id)
                 .input('estado', mssql.VarChar(20), detalle.estado)
-                .input('horas_trabajo', mssql.Decimal(5, 2), detalle.horas_trabajo)
                 .query(`
                     UPDATE Detalles_Orden
                     SET descripcion = @descripcion,
                         precio = @precio,
                         mecanico_id = @mecanico_id,
-                        estado = @estado,
-                        horas_trabajo = @horas_trabajo
+                        estado = @estado
                     OUTPUT INSERTED.*
                     WHERE detalle_id = @id
                 `);
