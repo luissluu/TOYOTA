@@ -35,9 +35,6 @@ router.post('/', createDetalle);
 // Actualizar un detalle
 router.put('/:id', updateDetalle);
 
-// Actualizar estado de un detalle
-router.patch('/:id/estado', updateEstado);
-
 // Actualizar mecánico de un detalle
 router.patch('/:id/mecanico', updateMecanico);
 
