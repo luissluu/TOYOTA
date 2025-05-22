@@ -9,7 +9,6 @@ class OrdenServicio {
                 .input('usuario_id', mssql.Int, orden.usuario_id)
                 .input('vehiculo_id', mssql.Int, orden.vehiculo_id)
                 .input('fecha_inicio', mssql.DateTime, orden.fecha_inicio)
-                .input('fecha_finalizacion', mssql.DateTime, orden.fecha_finalizacion)
                 .input('estado', mssql.VarChar(30), orden.estado || 'abierta')
                 .input('diagnostico', mssql.Text, orden.diagnostico)
                 .input('notas', mssql.Text, orden.notas)
@@ -17,11 +16,11 @@ class OrdenServicio {
                 .input('total', mssql.Decimal(10, 2), orden.total || 0)
                 .query(`
                     INSERT INTO Ordenes_Servicio (
-                        cita_id, usuario_id, vehiculo_id, fecha_inicio, fecha_finalizacion,
+                        cita_id, usuario_id, vehiculo_id, fecha_inicio,
                         estado, diagnostico, notas, creado_por, total
                     )
                     VALUES (
-                        @cita_id, @usuario_id, @vehiculo_id, @fecha_inicio, @fecha_finalizacion,
+                        @cita_id, @usuario_id, @vehiculo_id, @fecha_inicio,
                         @estado, @diagnostico, @notas, @creado_por, @total
                     );
                     SELECT SCOPE_IDENTITY() AS orden_id;

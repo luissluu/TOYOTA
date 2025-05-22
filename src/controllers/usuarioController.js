@@ -4,6 +4,10 @@ const bcrypt = require('bcrypt');
 const usuarioController = {
     async getAll(req, res) {
         try {
+            if (req.query.rol) {
+                const usuarios = await Usuario.findByRol(req.query.rol);
+                return res.json(usuarios);
+            }
             const usuarios = await Usuario.findAll();
             res.json(usuarios);
         } catch (error) {

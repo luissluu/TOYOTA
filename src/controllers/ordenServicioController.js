@@ -1,4 +1,5 @@
 const OrdenServicio = require('../entities/OrdenServicio');
+const DetalleOrden = require('../entities/DetalleOrden');
 
 // Obtener todas las órdenes de servicio
 const getAllOrdenes = async (req, res) => {
@@ -67,7 +68,23 @@ const getOrdenesByEstado = async (req, res) => {
 // Crear una nueva orden de servicio
 const createOrden = async (req, res) => {
     try {
-        const orden = await OrdenServicio.create(req.body);
+        // Crear la orden principal
+        const { servicios, ...ordenData } = req.body;
+        const orden = await OrdenServicio.create(ordenData);
+        // Crear los detalles de la orden para cada servicio
+        if (Array.isArray(servicios)) {
+            for (const s of servicios) {
+                await DetalleOrden.create({
+                    orden_id: orden.orden_id,
+                    servicio_id: s.id,
+                    mecanico_id: s.mecanico_id || null,
+                    estado: 'pendiente',
+                    descripcion: '',
+                    precio: null,
+                    notas: ''
+                });
+            }
+        }
         res.status(201).json(orden);
     } catch (error) {
         console.error('Error al crear orden:', error);

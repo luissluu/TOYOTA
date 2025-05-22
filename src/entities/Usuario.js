@@ -152,6 +152,23 @@ class Usuario {
             throw error;
         }
     }
+
+    static async findByRol(tipo_rol) {
+        try {
+            const pool = await getConnection();
+            const result = await pool.request()
+                .input('tipo_rol', mssql.VarChar(50), tipo_rol)
+                .query(`
+                    SELECT u.*, r.tipo_rol 
+                    FROM Usuarios u
+                    INNER JOIN Roles r ON u.rol_id = r.rol_id
+                    WHERE r.tipo_rol = @tipo_rol
+                `);
+            return result.recordset;
+        } catch (error) {
+            throw error;
+        }
+    }
 }
 
 module.exports = Usuario;
