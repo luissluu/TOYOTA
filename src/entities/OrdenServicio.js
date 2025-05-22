@@ -15,15 +15,14 @@ class OrdenServicio {
                 .input('notas', mssql.Text, orden.notas)
                 .input('creado_por', mssql.Int, orden.creado_por)
                 .input('total', mssql.Decimal(10, 2), orden.total || 0)
-                .input('kilometraje', mssql.Int, orden.kilometraje)
                 .query(`
                     INSERT INTO Ordenes_Servicio (
                         cita_id, usuario_id, vehiculo_id, fecha_inicio, fecha_finalizacion,
-                        estado, diagnostico, notas, creado_por, total, kilometraje
+                        estado, diagnostico, notas, creado_por, total
                     )
                     VALUES (
                         @cita_id, @usuario_id, @vehiculo_id, @fecha_inicio, @fecha_finalizacion,
-                        @estado, @diagnostico, @notas, @creado_por, @total, @kilometraje
+                        @estado, @diagnostico, @notas, @creado_por, @total
                     );
                     SELECT SCOPE_IDENTITY() AS orden_id;
                 `);
@@ -187,7 +186,6 @@ class OrdenServicio {
                 .input('diagnostico', mssql.Text, orden.diagnostico)
                 .input('notas', mssql.Text, orden.notas)
                 .input('total', mssql.Decimal(10, 2), orden.total)
-                .input('kilometraje', mssql.Int, orden.kilometraje)
                 .query(`
                     UPDATE Ordenes_Servicio
                     SET fecha_inicio = @fecha_inicio,
@@ -195,8 +193,7 @@ class OrdenServicio {
                         estado = @estado,
                         diagnostico = @diagnostico,
                         notas = @notas,
-                        total = @total,
-                        kilometraje = @kilometraje
+                        total = @total
                     OUTPUT INSERTED.*
                     WHERE orden_id = @id
                 `);
