@@ -5,8 +5,14 @@ const usuarioController = {
     async getAll(req, res) {
         try {
             if (req.query.rol) {
-                const usuarios = await Usuario.findByRol(req.query.rol);
-                return res.json(usuarios);
+                // Si es un número, buscar por rol_id
+                if (!isNaN(req.query.rol)) {
+                    const usuarios = await Usuario.findByRolId(Number(req.query.rol));
+                    return res.json(usuarios);
+                } else {
+                    const usuarios = await Usuario.findByRol(req.query.rol);
+                    return res.json(usuarios);
+                }
             }
             const usuarios = await Usuario.findAll();
             res.json(usuarios);
