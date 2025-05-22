@@ -1,4 +1,5 @@
 const DetalleOrden = require('../entities/DetalleOrden');
+const OrdenServicio = require('../entities/OrdenServicio');
 
 // Obtener todos los detalles
 const getAllDetalles = async (req, res) => {
@@ -169,6 +170,16 @@ const updateEstadoDetalle = async (req, res) => {
         const detalle = await DetalleOrden.updateEstado(id, estado);
         if (!detalle) {
             return res.status(404).json({ error: 'Detalle de orden no encontrado' });
+        }
+        if (estado === 'completado') {
+            const detalles = await DetalleOrden.findByOrden(detalle.orden_id);
+            const orden = await OrdenServicio.findById(detalle.orden_id);
+            if (orden && orden.estado === 'abierta') {
+                const algunoCompletado = detalles.some(d => d.estado === 'completado');
+                if (algunoCompletado) {
+                    await OrdenServicio.updateEstado(detalle.orden_id, 'en progreso');
+                }
+            }
         }
         res.json(detalle);
     } catch (error) {
