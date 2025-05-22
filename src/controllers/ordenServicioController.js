@@ -196,6 +196,13 @@ const finalizarOrden = async (req, res) => {
         }
         // Obtener la orden actual para conservar el total
         const ordenActual = await OrdenServicio.findById(id);
+        // Si la orden tiene cita asociada, eliminar la cita
+        if (ordenActual.cita_id) {
+            const pool = await require('../config/database').getConnection();
+            await pool.request()
+                .input('cita_id', require('mssql').Int, ordenActual.cita_id)
+                .query('DELETE FROM Citas WHERE cita_id = @cita_id');
+        }
         // Finalizar la orden
         const ordenFinalizada = await OrdenServicio.update(id, {
             estado: 'finalizada',
