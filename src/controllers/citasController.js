@@ -3,7 +3,15 @@ const Cita = require('../entities/Cita');
 // Obtener todas las citas
 const getAllCitas = async (req, res) => {
     try {
-        const citas = await Cita.findAll();
+        const { estado } = req.query;
+        let citas;
+        
+        if (estado) {
+            citas = await Cita.findByEstado(estado);
+        } else {
+            citas = await Cita.findAll();
+        }
+        
         res.json(citas);
     } catch (error) {
         console.error('Error al obtener citas:', error);

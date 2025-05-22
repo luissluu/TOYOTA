@@ -148,6 +148,30 @@ class Cita {
         }
     }
 
+    static async findByEstado(estado) {
+        try {
+            const pool = await getConnection();
+            const result = await pool.request()
+                .input('estado', mssql.VarChar(20), estado)
+                .query(`
+                    SELECT c.*, 
+                           u.nombre as nombre_usuario, 
+                           u.apellidoPaterno as apellido_usuario,
+                           v.marca as marca_vehiculo,
+                           v.modelo as modelo_vehiculo,
+                           v.placa as placa_vehiculo
+                    FROM Citas c
+                    INNER JOIN Usuarios u ON c.usuario_id = u.usuario_id
+                    INNER JOIN Vehiculos v ON c.vehiculo_id = v.vehiculo_id
+                    WHERE c.estado = @estado
+                    ORDER BY c.fecha DESC
+                `);
+            return result.recordset;
+        } catch (error) {
+            throw error;
+        }
+    }
+
     static async update(id, cita) {
         try {
             const pool = await getConnection();
