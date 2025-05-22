@@ -164,20 +164,26 @@ const updateEstadoDetalle = async (req, res) => {
     try {
         const { id } = req.params;
         const { estado } = req.body;
+        console.log('[updateEstadoDetalle] id:', id, 'nuevo estado:', estado);
         if (!estado) {
             return res.status(400).json({ error: 'El estado es requerido' });
         }
         const detalle = await DetalleOrden.updateEstado(id, estado);
+        console.log('[updateEstadoDetalle] Detalle actualizado:', detalle);
         if (!detalle) {
             return res.status(404).json({ error: 'Detalle de orden no encontrado' });
         }
         if (estado === 'completado') {
             const detalles = await DetalleOrden.findByOrden(detalle.orden_id);
+            console.log('[updateEstadoDetalle] Detalles de la orden:', detalles);
             const orden = await OrdenServicio.findById(detalle.orden_id);
+            console.log('[updateEstadoDetalle] Orden encontrada:', orden);
             if (orden && orden.estado === 'abierta') {
                 const algunoCompletado = detalles.some(d => d.estado === 'completado');
+                console.log('[updateEstadoDetalle] ¿Algún detalle completado?:', algunoCompletado);
                 if (algunoCompletado) {
-                    await OrdenServicio.updateEstado(detalle.orden_id, 'en progreso');
+                    const resultado = await OrdenServicio.updateEstado(detalle.orden_id, 'en progreso');
+                    console.log('[updateEstadoDetalle] Resultado updateEstado orden:', resultado);
                 }
             }
         }
