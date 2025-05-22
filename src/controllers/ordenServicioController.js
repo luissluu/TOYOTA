@@ -194,11 +194,14 @@ const finalizarOrden = async (req, res) => {
         if (incompletos.length > 0) {
             return res.status(400).json({ error: 'No todos los servicios están completados' });
         }
+        // Obtener la orden actual para conservar el total
+        const ordenActual = await OrdenServicio.findById(id);
         // Finalizar la orden
         const ordenFinalizada = await OrdenServicio.update(id, {
             estado: 'finalizada',
             fecha_finalizacion: new Date(),
-            finalizada_por: usuario_id
+            finalizada_por: usuario_id,
+            total: ordenActual.total
         });
         res.json({ message: 'Orden finalizada correctamente', orden: ordenFinalizada });
     } catch (error) {
