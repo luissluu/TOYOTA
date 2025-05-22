@@ -344,8 +344,15 @@ const me = async (req, res) => {
     // No enviar la contraseña
     if (usuario.contraseña) delete usuario.contraseña;
 
-    res.json(usuario);
+    // Asegurarse de que el ID esté presente en la respuesta
+    const responseData = {
+      ...usuario,
+      id: usuario.usuario_id // Asegurar que el ID esté presente como 'id'
+    };
+
+    res.json(responseData);
   } catch (error) {
+    console.error('Error en /me:', error);
     res.status(500).json({ message: 'Error al obtener datos del usuario' });
   }
 };
