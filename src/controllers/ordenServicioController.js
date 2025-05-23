@@ -20,11 +20,11 @@ const getOrdenById = async (req, res) => {
     try {
         const { id } = req.params;
         const orden = await OrdenServicio.findById(id);
-        
         if (!orden) {
             return res.status(404).json({ error: 'Orden de servicio no encontrada' });
         }
-        
+        // Agrega los detalles de la orden
+        orden.detalles = await DetalleOrden.findByOrden(orden.orden_id);
         res.json(orden);
     } catch (error) {
         console.error('Error al obtener orden:', error);
