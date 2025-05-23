@@ -16,7 +16,6 @@ const detalleOrdenRoutes = require('./routes/detalleOrdenRoutes');
 const pedidoRoutes = require('./routes/pedidoRoutes');
 const detallePedidoRoutes = require('./routes/detallePedidoRoutes');
 const movimientoInventarioRoutes = require('./routes/movimientoInventarioRoutes');
-const historialVehiculoRoutes = require('./routes/historialVehiculoRoutes');
 const inventarioHerramientaRoutes = require('./routes/inventarioHerramientaRoutes');
 
 // Cargar variables de entorno
@@ -46,7 +45,6 @@ app.use('/api/detalles-orden', detalleOrdenRoutes);
 app.use('/api/pedidos', pedidoRoutes);
 app.use('/api/detalles-pedido', detallePedidoRoutes);
 app.use('/api/movimientos-inventario', movimientoInventarioRoutes);
-app.use('/api/historial-vehiculo', historialVehiculoRoutes);
 app.use('/api/inventario-herramientas', inventarioHerramientaRoutes);
 
 // Ruta base
