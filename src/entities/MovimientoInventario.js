@@ -8,13 +8,13 @@ class MovimientoInventario {
                 .input('articulo_id', mssql.Int, movimiento.articulo_id)
                 .input('tipo_movimiento', mssql.VarChar(20), movimiento.tipo_movimiento)
                 .input('cantidad', mssql.Int, movimiento.cantidad)
-                .input('orden_id', mssql.Int, movimiento.orden_id)
-                .input('proveedor_id', mssql.Int, movimiento.proveedor_id)
-                .input('precio_unitario', mssql.Decimal(10, 2), movimiento.precio_unitario)
+                .input('orden_id', mssql.Int, movimiento.orden_id || null)
+                .input('proveedor_id', mssql.Int, movimiento.proveedor_id || null)
+                .input('precio_unitario', mssql.Decimal(10, 2), movimiento.precio_unitario || 0)
                 .input('usuario_id', mssql.Int, movimiento.usuario_id)
-                .input('motivo', mssql.VarChar(255), movimiento.motivo)
-                .input('numero_factura', mssql.VarChar(50), movimiento.numero_factura)
-                .input('notas', mssql.Text, movimiento.notas)
+                .input('motivo', mssql.VarChar(255), movimiento.motivo || '')
+                .input('numero_factura', mssql.VarChar(50), movimiento.numero_factura || '')
+                .input('notas', mssql.Text, movimiento.notas || '')
                 .query(`
                     INSERT INTO Movimientos_Inventario (
                         articulo_id, tipo_movimiento, cantidad, orden_id,
@@ -28,11 +28,10 @@ class MovimientoInventario {
                     );
                     SELECT SCOPE_IDENTITY() AS movimiento_id;
                 `);
-            
+    
             const movimientoId = result.recordset[0].movimiento_id;
             const movimientoCreado = await this.findById(movimientoId);
             return movimientoCreado;
-            
         } catch (error) {
             if (error.message.includes('FOREIGN KEY constraint')) {
                 throw new Error('El artículo, orden, proveedor o usuario especificado no existe');
