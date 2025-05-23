@@ -18,12 +18,6 @@ const {
 // Obtener todas las órdenes
 router.get('/', getAllOrdenes);
 
-// Obtener PDF de una orden por ID
-router.get('/:id/pdf', exportarPDFOrden);
-
-// Obtener una orden por ID
-router.get('/:id', getOrdenById);
-
 // Obtener órdenes por usuario
 router.get('/usuario/:usuarioId', getOrdenesByUsuario);
 
@@ -32,6 +26,12 @@ router.get('/vehiculo/:vehiculoId', getOrdenesByVehiculo);
 
 // Obtener órdenes por estado
 router.get('/estado/:estado', getOrdenesByEstado);
+
+// Obtener una orden por ID
+router.get('/:id', getOrdenById);
+
+// Obtener PDF de una orden por ID
+router.get('/:id/pdf', exportarPDFOrden);
 
 // Crear una nueva orden
 router.post('/', createOrden);
