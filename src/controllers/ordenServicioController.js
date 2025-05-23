@@ -379,33 +379,46 @@ const exportarPDFOrden = async (req, res) => {
       let yPos = 388;
       let total = 0;
   
+      // Anchos de columnas
+      const colWidths = [40, 270, 80, 80];
+      const colX = [40, 90, 360, 440, 520]; // posiciones X de cada columna
+  
       detalles.forEach((detalle, i) => {
         const descripcion = detalle.descripcion_servicio || detalle.nombre_servicio || '';
         const precio = `$${detalle.precio || detalle.costo || 0}`;
         const importe = `$${detalle.precio || detalle.costo || 0}`;
   
         // Calcula la altura necesaria para la descripción
-        const descHeight = doc.heightOfString(descripcion, { width: 270 });
+        const descHeight = doc.heightOfString(descripcion, { width: colWidths[1] });
         const rowHeight = Math.max(descHeight, 20);
   
         // Fondo alterno
         const bgColor = i % 2 === 0 ? '#F5F5F5' : 'white';
-        doc.rect(30, yPos, 555, rowHeight).fillAndStroke(bgColor, toyotaGray);
+        doc.rect(30, yPos, 555, rowHeight).fill(bgColor);
+  
+        // Bordes horizontales
+        doc.moveTo(30, yPos).lineTo(585, yPos).strokeColor(toyotaGray).lineWidth(1).stroke();
+        doc.moveTo(30, yPos + rowHeight).lineTo(585, yPos + rowHeight).strokeColor(toyotaGray).lineWidth(1).stroke();
+  
+        // Bordes verticales (opcional, para look de tabla)
+        colX.forEach(x => {
+          doc.moveTo(x, yPos).lineTo(x, yPos + rowHeight).strokeColor(toyotaGray).lineWidth(1).stroke();
+        });
   
         // Cantidad
         doc.fontSize(12)
            .fillColor('black')
            .font('Helvetica')
-           .text('1', 40, yPos + 4, { width: 40, align: 'center' });
+           .text('1', colX[0], yPos + 4, { width: colWidths[0], align: 'center' });
   
         // Descripción (con salto de línea)
-        doc.text(descripcion, 90, yPos + 4, { width: 270, align: 'left' });
+        doc.text(descripcion, colX[1], yPos + 4, { width: colWidths[1], align: 'left' });
   
         // Costo
-        doc.text(precio, 370, yPos + 4, { width: 80, align: 'right' });
+        doc.text(precio, colX[2], yPos + 4, { width: colWidths[2], align: 'right' });
   
         // Importe
-        doc.text(importe, 460, yPos + 4, { width: 80, align: 'right' });
+        doc.text(importe, colX[3], yPos + 4, { width: colWidths[3], align: 'right' });
   
         total += Number(detalle.precio || detalle.costo || 0);
         yPos += rowHeight;
