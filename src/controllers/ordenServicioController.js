@@ -227,9 +227,28 @@ const finalizarOrden = async (req, res) => {
             const nombreCliente = `${ordenActual.nombre_usuario || ''} ${ordenActual.apellido_usuario || ''}`.trim();
             const modeloAuto = `${ordenActual.marca_vehiculo || ''} ${ordenActual.modelo_vehiculo || ''}`.trim();
             const html = `
-              <h2>¡Hola ${nombreCliente}!</h2>
-              <p>Te informamos que tu auto <b>${modeloAuto}</b> ya está listo para ser recogido en el taller.</p>
-              <p>¡Gracias por confiar en Toyota Taller!</p>
+              <div style="font-family: Arial, sans-serif; background: #f4f4f4; padding: 32px;">
+                <div style="max-width: 500px; margin: 0 auto; background: #fff; border-radius: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.07); overflow: hidden;">
+                  <div style="background: linear-gradient(90deg, #EB0A1E 0%, #222 100%); padding: 24px 0; text-align: center;">
+                    <img src="https://toyota-one.vercel.app/Logo.png" alt="Toyota" style="width: 80px; height: 80px; margin-bottom: 8px; display: block; margin-left: auto; margin-right: auto;" />
+                    <h1 style="color: #fff; margin: 0; font-size: 1.7rem;">Toyota Taller Mecánico</h1>
+                  </div>
+                  <div style="padding: 32px 24px 24px 24px; text-align: center;">
+                    <h2 style="color: #EB0A1E; margin-bottom: 16px;">¡Tu auto está listo!</h2>
+                    <p style="color: #333; font-size: 1.1rem; margin-bottom: 24px;">
+                      Hola <b>${nombreCliente}</b>,<br>
+                      Te informamos que tu auto <b>${modeloAuto}</b> ya está listo para ser recogido en nuestro taller.
+                    </p>
+                    <p style="color: #666; font-size: 1rem; margin-bottom: 24px;">
+                      Si tienes dudas o necesitas más información, contáctanos.<br>
+                      ¡Gracias por confiar en Toyota Taller!
+                    </p>
+                  </div>
+                  <div style="background: #f4f4f4; color: #888; font-size: 0.9rem; padding: 16px; text-align: center; border-top: 1px solid #eee;">
+                    &copy; ${new Date().getFullYear()} Toyota Taller Mecánico
+                  </div>
+                </div>
+              </div>
             `;
             await enviarCorreo(ordenActual.email, '¡Tu auto está listo!', html);
         }

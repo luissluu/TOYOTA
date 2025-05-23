@@ -90,11 +90,31 @@ const createCita = async (req, res) => {
         const usuario = await Usuario.findById(req.usuario.id);
         if (usuario && usuario.correoElectronico) {
             const html = `
-              <h2>¡Hola ${usuario.nombre}!</h2>
-              <p>Tu cita ha sido registrada exitosamente en Toyota Taller.</p>
-              <p>Fecha y hora: <b>${cita.fecha}</b></p>
-              <p>Tipo de servicio: <b>${cita.tipo_servicio}</b></p>
-              <p>¡Te esperamos!</p>
+              <div style="font-family: Arial, sans-serif; background: #f4f4f4; padding: 32px;">
+                <div style="max-width: 500px; margin: 0 auto; background: #fff; border-radius: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.07); overflow: hidden;">
+                  <div style="background: linear-gradient(90deg, #EB0A1E 0%, #222 100%); padding: 24px 0; text-align: center;">
+                    <img src="https://toyota-one.vercel.app/Logo.png" alt="Toyota" style="width: 80px; height: 80px; margin-bottom: 8px; display: block; margin-left: auto; margin-right: auto;" />
+                    <h1 style="color: #fff; margin: 0; font-size: 1.7rem;">Toyota Taller Mecánico</h1>
+                  </div>
+                  <div style="padding: 32px 24px 24px 24px; text-align: center;">
+                    <h2 style="color: #EB0A1E; margin-bottom: 16px;">¡Cita registrada!</h2>
+                    <p style="color: #333; font-size: 1.1rem; margin-bottom: 24px;">
+                      Hola <b>${usuario.nombre}</b>,<br>
+                      Tu cita ha sido registrada exitosamente.
+                    </p>
+                    <p style="color: #666; font-size: 1rem; margin-bottom: 24px;">
+                      <b>Fecha y hora:</b> ${cita.fecha}<br>
+                      <b>Tipo de servicio:</b> ${cita.tipo_servicio}
+                    </p>
+                    <p style="color: #666; font-size: 1rem;">
+                      ¡Te esperamos en Toyota Taller!
+                    </p>
+                  </div>
+                  <div style="background: #f4f4f4; color: #888; font-size: 0.9rem; padding: 16px; text-align: center; border-top: 1px solid #eee;">
+                    &copy; ${new Date().getFullYear()} Toyota Taller Mecánico
+                  </div>
+                </div>
+              </div>
             `;
             await enviarCorreo(usuario.correoElectronico, 'Confirmación de cita - Toyota Taller', html);
         }
