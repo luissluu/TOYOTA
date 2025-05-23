@@ -3,6 +3,7 @@ const DetalleOrden = require('../entities/DetalleOrden');
 const Servicio = require('../entities/servicio');
 const PDFDocument = require('pdfkit');
 const path = require('path');
+const { enviarCorreo } = require('../utils/email');
 
 // Obtener todas las órdenes de servicio
 const getAllOrdenes = async (req, res) => {
@@ -221,6 +222,17 @@ const finalizarOrden = async (req, res) => {
             notas: ordenActual.notas,
             cita_id: null
         });
+        // Enviar correo al cliente
+        if (ordenActual.email) {
+            const nombreCliente = `${ordenActual.nombre_usuario || ''} ${ordenActual.apellido_usuario || ''}`.trim();
+            const modeloAuto = `${ordenActual.marca_vehiculo || ''} ${ordenActual.modelo_vehiculo || ''}`.trim();
+            const html = `
+              <h2>¡Hola ${nombreCliente}!</h2>
+              <p>Te informamos que tu auto <b>${modeloAuto}</b> ya está listo para ser recogido en el taller.</p>
+              <p>¡Gracias por confiar en Toyota Taller!</p>
+            `;
+            await enviarCorreo(ordenActual.email, '¡Tu auto está listo!', html);
+        }
         res.json({ message: 'Orden finalizada correctamente', orden: ordenFinalizada });
     } catch (error) {
         console.error('Error al finalizar orden:', error);

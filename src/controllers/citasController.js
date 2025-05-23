@@ -1,4 +1,6 @@
 const Cita = require('../entities/Cita');
+const { enviarCorreo } = require('../utils/email');
+const Usuario = require('../entities/Usuario');
 
 // Obtener todas las citas
 const getAllCitas = async (req, res) => {
@@ -84,6 +86,18 @@ const createCita = async (req, res) => {
         // Eliminar cualquier referencia a creado_por si existe
         delete citaData.creado_por;
         const cita = await Cita.create(citaData);
+        // Obtener el correo del usuario
+        const usuario = await Usuario.findById(req.usuario.id);
+        if (usuario && usuario.correoElectronico) {
+            const html = `
+              <h2>¡Hola ${usuario.nombre}!</h2>
+              <p>Tu cita ha sido registrada exitosamente en Toyota Taller.</p>
+              <p>Fecha y hora: <b>${cita.fecha}</b></p>
+              <p>Tipo de servicio: <b>${cita.tipo_servicio}</b></p>
+              <p>¡Te esperamos!</p>
+            `;
+            await enviarCorreo(usuario.correoElectronico, 'Confirmación de cita - Toyota Taller', html);
+        }
         res.status(201).json(cita);
     } catch (error) {
         console.error('Error al crear cita:', error);
