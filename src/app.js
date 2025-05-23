@@ -17,6 +17,7 @@ const pedidoRoutes = require('./routes/pedidoRoutes');
 const detallePedidoRoutes = require('./routes/detallePedidoRoutes');
 const movimientoInventarioRoutes = require('./routes/movimientoInventarioRoutes');
 const inventarioHerramientaRoutes = require('./routes/inventarioHerramientaRoutes');
+const estadisticasRoutes = require('./routes/estadisticasRoutes');
 
 // Cargar variables de entorno
 dotenv.config();
@@ -46,6 +47,7 @@ app.use('/api/pedidos', pedidoRoutes);
 app.use('/api/detalles-pedido', detallePedidoRoutes);
 app.use('/api/movimientos-inventario', movimientoInventarioRoutes);
 app.use('/api/inventario-herramientas', inventarioHerramientaRoutes);
+app.use('/api/estadisticas', estadisticasRoutes);
 
 // Ruta base
 app.get('/', (req, res) => {
