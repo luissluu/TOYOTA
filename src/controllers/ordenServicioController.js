@@ -1,6 +1,8 @@
 const OrdenServicio = require('../entities/OrdenServicio');
 const DetalleOrden = require('../entities/DetalleOrden');
 const Servicio = require('../entities/servicio');
+const PDFDocument = require('pdfkit');
+const path = require('path');
 
 // Obtener todas las órdenes de servicio
 const getAllOrdenes = async (req, res) => {
@@ -12,6 +14,104 @@ const getAllOrdenes = async (req, res) => {
         res.status(500).json({ error: 'Error al obtener las órdenes de servicio' });
     }
 };
+// Exportar PDF de una orden de servicio
+const exportarPDFOrden = async (req, res) => {
+    try {
+      const { id } = req.params;
+      const orden = await OrdenServicio.findById(id);
+      if (!orden) {
+        return res.status(404).json({ error: 'Orden de servicio no encontrada' });
+      }
+      // Obtener detalles de la orden
+      const detalles = await DetalleOrden.findByOrden(id);
+  
+      // Crear el PDF
+      const doc = new PDFDocument({ margin: 40, size: 'A4' });
+      res.setHeader('Content-Type', 'application/pdf');
+      res.setHeader('Content-Disposition', `attachment; filename=orden-servicio-${id}.pdf`);
+      doc.pipe(res);
+  
+      // Logo
+      const logoPath = path.join(__dirname, '../../public/Images/Logo.png');
+      try {
+        doc.image(logoPath, 40, 30, { width: 90 });
+      } catch (e) {
+        // Si no se encuentra el logo, continuar sin error
+      }
+  
+      // Encabezado
+      doc.fontSize(18).font('Helvetica-Bold').text('Orden de Servicio', 150, 40, { align: 'center' });
+      doc.fontSize(12).font('Helvetica').text('Taller Mecánico', 150, 65, { align: 'center' });
+      doc.fontSize(10).text(`Folio: ${orden.orden_id}`, 450, 40);
+      doc.moveDown(2);
+  
+      // Datos del vehículo y cliente
+      doc.fontSize(12).font('Helvetica-Bold').text('Datos del Vehículo', 40, 110);
+      doc.fontSize(10).font('Helvetica').text(`Marca: ${orden.marca_vehiculo || ''}`, 40, 130);
+      doc.text(`Modelo: ${orden.modelo_vehiculo || ''}`, 200, 130);
+      doc.text(`Placa: ${orden.placa_vehiculo || ''}`, 360, 130);
+      doc.text(`Color: ${orden.color || ''}`, 40, 145);
+      doc.text(`Kilometraje: ${orden.kilometraje || ''}`, 200, 145);
+      doc.text(`Año: ${orden.anio || ''}`, 360, 145);
+      doc.moveDown();
+      doc.font('Helvetica-Bold').text('Datos del Cliente', 40, 170);
+      doc.font('Helvetica').fontSize(10).text(`Nombre: ${orden.nombre_usuario || ''} ${orden.apellido_usuario || ''}`, 40, 190);
+      doc.text(`Teléfono: ${orden.telefono || ''}`, 300, 190);
+      doc.text(`Email: ${orden.email || ''}`, 40, 205);
+      doc.moveDown(2);
+  
+      // Fechas
+      doc.font('Helvetica-Bold').text('Ingreso:', 40, 230);
+      doc.font('Helvetica').text(orden.fecha_inicio ? new Date(orden.fecha_inicio).toLocaleDateString() : '', 100, 230);
+      doc.font('Helvetica-Bold').text('Salida:', 200, 230);
+      doc.font('Helvetica').text(orden.fecha_finalizacion ? new Date(orden.fecha_finalizacion).toLocaleDateString() : '', 250, 230);
+      doc.moveDown(2);
+  
+      // Tabla de servicios
+      doc.font('Helvetica-Bold').fontSize(12).text('Trabajos Realizados', 40, 260);
+      doc.moveTo(40, 275).lineTo(550, 275).stroke();
+      doc.fontSize(10).font('Helvetica-Bold');
+      doc.text('CANT', 40, 280, { width: 40 });
+      doc.text('DESCRIPCIÓN DEL TRABAJO', 90, 280, { width: 250 });
+      doc.text('COSTO', 350, 280, { width: 80 });
+      doc.text('IMPORTE', 430, 280, { width: 80 });
+      doc.moveTo(40, 295).lineTo(550, 295).stroke();
+      doc.font('Helvetica').fontSize(10);
+      let y = 300;
+      let total = 0;
+      detalles.forEach((detalle, i) => {
+        doc.text('1', 40, y, { width: 40 });
+        doc.text(detalle.descripcion_servicio || detalle.nombre_servicio || '', 90, y, { width: 250 });
+        doc.text(`$${detalle.precio || detalle.costo || 0}`, 350, y, { width: 80 });
+        doc.text(`$${detalle.precio || detalle.costo || 0}`, 430, y, { width: 80 });
+        total += Number(detalle.precio || detalle.costo || 0);
+        y += 18;
+      });
+      doc.moveTo(40, y).lineTo(550, y).stroke();
+      doc.font('Helvetica-Bold').text('TOTAL:', 350, y + 5);
+      doc.font('Helvetica').text(`$${total}`, 430, y + 5);
+      y += 30;
+  
+      // Observaciones
+      doc.font('Helvetica-Bold').fontSize(12).text('Observaciones', 40, y);
+      doc.font('Helvetica').fontSize(10).text(orden.notas || 'N/A', 40, y + 18, { width: 500 });
+      y += 50;
+  
+      // Firmas
+      doc.font('Helvetica-Bold').fontSize(10).text('Firma del Prestador del Servicio', 60, y + 40);
+      doc.font('Helvetica-Bold').fontSize(10).text('Firma del Consumidor', 350, y + 40);
+      doc.moveTo(60, y + 70).lineTo(220, y + 70).stroke();
+      doc.moveTo(350, y + 70).lineTo(510, y + 70).stroke();
+  
+      // Pie de página
+      doc.font('Helvetica').fontSize(9).text('Av. Reforma #1234, Col. Juárez, Ciudad de México, C.P. 06600. Tel: 554412457812', 40, 780, { align: 'center', width: 520 });
+      doc.end();
+    } catch (error) {
+      console.error('Error al generar PDF de la orden:', error);
+      res.status(500).json({ error: 'Error al generar el PDF de la orden' });
+    }
+  };
+  
 
 // Obtener una orden por ID
 const getOrdenById = async (req, res) => {
@@ -237,5 +337,6 @@ module.exports = {
     updateEstado,
     updateTotal,
     deleteOrden,
-    finalizarOrden
+    finalizarOrden,
+    exportarPDFOrden
 }; 
