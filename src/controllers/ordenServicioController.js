@@ -400,25 +400,29 @@ const exportarPDFOrden = async (req, res) => {
         doc.moveTo(30, yPos).lineTo(585, yPos).strokeColor(toyotaGray).lineWidth(1).stroke();
         doc.moveTo(30, yPos + rowHeight).lineTo(585, yPos + rowHeight).strokeColor(toyotaGray).lineWidth(1).stroke();
   
-        // Bordes verticales (opcional, para look de tabla)
+        // Bordes verticales
         colX.forEach(x => {
           doc.moveTo(x, yPos).lineTo(x, yPos + rowHeight).strokeColor(toyotaGray).lineWidth(1).stroke();
         });
+  
+        // Centrado vertical para las celdas de una sola línea
+        const singleLineHeight = doc.heightOfString('1', { width: colWidths[0] });
+        const centerY = yPos + (rowHeight - singleLineHeight) / 2;
   
         // Cantidad
         doc.fontSize(12)
            .fillColor('black')
            .font('Helvetica')
-           .text('1', colX[0], yPos + 4, { width: colWidths[0], align: 'center' });
+           .text('1', colX[0], centerY, { width: colWidths[0], align: 'center' });
   
-        // Descripción (con salto de línea)
+        // Descripción (con salto de línea, siempre arriba)
         doc.text(descripcion, colX[1], yPos + 4, { width: colWidths[1], align: 'left' });
   
         // Costo
-        doc.text(precio, colX[2], yPos + 4, { width: colWidths[2], align: 'right' });
+        doc.text(precio, colX[2], centerY, { width: colWidths[2], align: 'right' });
   
         // Importe
-        doc.text(importe, colX[3], yPos + 4, { width: colWidths[3], align: 'right' });
+        doc.text(importe, colX[3], centerY, { width: colWidths[3], align: 'right' });
   
         total += Number(detalle.precio || detalle.costo || 0);
         yPos += rowHeight;
