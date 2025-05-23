@@ -250,6 +250,7 @@ const exportarExcel = async (req, res) => {
     }
 };
 
+
 module.exports = {
     getAllHistorial,
     getHistorialById,

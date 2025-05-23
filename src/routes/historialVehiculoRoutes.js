@@ -11,7 +11,8 @@ const {
     updateHistorial,
     deleteHistorial,
     exportarPDF,
-    exportarExcel
+    exportarExcel,
+    deleteHistorial
 } = require('../controllers/historialVehiculoController');
 
 // Obtener todo el historial
@@ -32,11 +33,13 @@ router.get('/mecanico/:mecanicoId', getHistorialByMecanico);
 // Obtener historial por rango de fechas
 router.get('/fecha', getHistorialByFecha);
 
+
 // Exportar PDF de un servicio
 router.get('/:id/pdf', exportarPDF);
 
 // Exportar Excel de todo el historial
 router.get('/export', exportarExcel);
+
 
 // Crear un nuevo registro en el historial
 router.post('/', createHistorial);
