@@ -1,6 +1,5 @@
 const HistorialVehiculo = require('../entities/HistorialVehiculo');
-const PDFDocument = require('pdfkit');
-const ExcelJS = require('exceljs');
+
 
 // Obtener todo el historial
 const getAllHistorial = async (req, res) => {
@@ -139,116 +138,6 @@ const deleteHistorial = async (req, res) => {
     }
 };
 
-// Exportar PDF de un servicio
-const exportarPDF = async (req, res) => {
-    try {
-        const { id } = req.params;
-        const historial = await HistorialVehiculo.findById(id);
-        
-        if (!historial) {
-            return res.status(404).json({ error: 'Registro de historial no encontrado' });
-        }
-
-        const doc = new PDFDocument();
-        res.setHeader('Content-Type', 'application/pdf');
-        res.setHeader('Content-Disposition', `attachment; filename=servicio-${id}.pdf`);
-        
-        doc.pipe(res);
-
-        // Título
-        doc.fontSize(20).text('Detalles del Servicio', { align: 'center' });
-        doc.moveDown();
-
-        // Información del servicio
-        doc.fontSize(12).text(`ID del Servicio: ${historial.historial_id}`);
-        doc.text(`Fecha: ${new Date(historial.fecha).toLocaleDateString()}`);
-        doc.text(`Tipo de Servicio: ${historial.tipo_servicio}`);
-        doc.text(`Descripción: ${historial.descripcion}`);
-        doc.text(`Kilometraje: ${historial.kilometraje}`);
-        doc.text(`Observaciones: ${historial.observaciones}`);
-        doc.moveDown();
-
-        // Información del vehículo
-        doc.fontSize(14).text('Información del Vehículo');
-        doc.fontSize(12).text(`Marca: ${historial.marca}`);
-        doc.text(`Modelo: ${historial.modelo}`);
-        doc.text(`Placa: ${historial.placa}`);
-        doc.moveDown();
-
-        // Información del cliente
-        doc.fontSize(14).text('Información del Cliente');
-        doc.fontSize(12).text(`Nombre: ${historial.nombre_usuario} ${historial.apellido_usuario}`);
-        doc.moveDown();
-
-        // Información del mecánico
-        if (historial.nombre_mecanico) {
-            doc.fontSize(14).text('Información del Mecánico');
-            doc.fontSize(12).text(`Nombre: ${historial.nombre_mecanico} ${historial.apellido_mecanico}`);
-        }
-
-        doc.end();
-    } catch (error) {
-        console.error('Error al generar PDF:', error);
-        res.status(500).json({ error: 'Error al generar el PDF' });
-    }
-};
-
-// Exportar Excel de todo el historial
-const exportarExcel = async (req, res) => {
-    try {
-        const historial = await HistorialVehiculo.findAll();
-        
-        const workbook = new ExcelJS.Workbook();
-        const worksheet = workbook.addWorksheet('Historial de Servicios');
-
-        // Definir columnas
-        worksheet.columns = [
-            { header: 'ID', key: 'id', width: 10 },
-            { header: 'Fecha', key: 'fecha', width: 15 },
-            { header: 'Tipo de Servicio', key: 'tipo_servicio', width: 30 },
-            { header: 'Descripción', key: 'descripcion', width: 40 },
-            { header: 'Kilometraje', key: 'kilometraje', width: 15 },
-            { header: 'Marca', key: 'marca', width: 15 },
-            { header: 'Modelo', key: 'modelo', width: 20 },
-            { header: 'Placa', key: 'placa', width: 15 },
-            { header: 'Cliente', key: 'cliente', width: 30 },
-            { header: 'Mecánico', key: 'mecanico', width: 30 }
-        ];
-
-        // Agregar datos
-        historial.forEach(servicio => {
-            worksheet.addRow({
-                id: servicio.historial_id,
-                fecha: new Date(servicio.fecha).toLocaleDateString(),
-                tipo_servicio: servicio.tipo_servicio,
-                descripcion: servicio.descripcion,
-                kilometraje: servicio.kilometraje,
-                marca: servicio.marca,
-                modelo: servicio.modelo,
-                placa: servicio.placa,
-                cliente: `${servicio.nombre_usuario} ${servicio.apellido_usuario}`,
-                mecanico: servicio.nombre_mecanico ? `${servicio.nombre_mecanico} ${servicio.apellido_mecanico}` : 'No asignado'
-            });
-        });
-
-        // Estilo para el encabezado
-        worksheet.getRow(1).font = { bold: true };
-        worksheet.getRow(1).fill = {
-            type: 'pattern',
-            pattern: 'solid',
-            fgColor: { argb: 'FFD3D3D3' }
-        };
-
-        res.setHeader('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
-        res.setHeader('Content-Disposition', 'attachment; filename=historial-servicios.xlsx');
-
-        await workbook.xlsx.write(res);
-        res.end();
-    } catch (error) {
-        console.error('Error al exportar Excel:', error);
-        res.status(500).json({ error: 'Error al exportar el historial' });
-    }
-};
 
 
 module.exports = {
@@ -260,7 +149,5 @@ module.exports = {
     getHistorialByFecha,
     createHistorial,
     updateHistorial,
-    deleteHistorial,
-    exportarPDF,
-    exportarExcel
+    deleteHistorial
 }; 
