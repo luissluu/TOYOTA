@@ -49,7 +49,7 @@ class MovimientoInventario {
                        i.codigo as codigo_articulo,
                        u.nombre as nombre_usuario,
                        u.apellidoPaterno as apellido_usuario,
-                       p.nombre as nombre_proveedor,
+                       p.nombre as nombre_proveedor
                 FROM Movimientos_Inventario m
                 INNER JOIN Inventario i ON m.articulo_id = i.articulo_id
                 INNER JOIN Usuarios u ON m.usuario_id = u.usuario_id
@@ -74,7 +74,7 @@ class MovimientoInventario {
                            i.codigo as codigo_articulo,
                            u.nombre as nombre_usuario,
                            u.apellidoPaterno as apellido_usuario,
-                           p.nombre as nombre_proveedor,
+                           p.nombre as nombre_proveedor
                     FROM Movimientos_Inventario m
                     INNER JOIN Inventario i ON m.articulo_id = i.articulo_id
                     INNER JOIN Usuarios u ON m.usuario_id = u.usuario_id
@@ -99,7 +99,7 @@ class MovimientoInventario {
                            i.codigo as codigo_articulo,
                            u.nombre as nombre_usuario,
                            u.apellidoPaterno as apellido_usuario,
-                           p.nombre as nombre_proveedor,
+                           p.nombre as nombre_proveedor
                     FROM Movimientos_Inventario m
                     INNER JOIN Inventario i ON m.articulo_id = i.articulo_id
                     INNER JOIN Usuarios u ON m.usuario_id = u.usuario_id
@@ -125,7 +125,7 @@ class MovimientoInventario {
                            i.codigo as codigo_articulo,
                            u.nombre as nombre_usuario,
                            u.apellidoPaterno as apellido_usuario,
-                           p.nombre as nombre_proveedor,
+                           p.nombre as nombre_proveedor
                     FROM Movimientos_Inventario m
                     INNER JOIN Inventario i ON m.articulo_id = i.articulo_id
                     INNER JOIN Usuarios u ON m.usuario_id = u.usuario_id
@@ -151,7 +151,7 @@ class MovimientoInventario {
                            i.codigo as codigo_articulo,
                            u.nombre as nombre_usuario,
                            u.apellidoPaterno as apellido_usuario,
-                           p.nombre as nombre_proveedor,
+                           p.nombre as nombre_proveedor
                     FROM Movimientos_Inventario m
                     INNER JOIN Inventario i ON m.articulo_id = i.articulo_id
                     INNER JOIN Usuarios u ON m.usuario_id = u.usuario_id
@@ -177,7 +177,7 @@ class MovimientoInventario {
                            i.codigo as codigo_articulo,
                            u.nombre as nombre_usuario,
                            u.apellidoPaterno as apellido_usuario,
-                           p.nombre as nombre_proveedor,
+                           p.nombre as nombre_proveedor
                     FROM Movimientos_Inventario m
                     INNER JOIN Inventario i ON m.articulo_id = i.articulo_id
                     INNER JOIN Usuarios u ON m.usuario_id = u.usuario_id
@@ -203,7 +203,7 @@ class MovimientoInventario {
                            i.codigo as codigo_articulo,
                            u.nombre as nombre_usuario,
                            u.apellidoPaterno as apellido_usuario,
-                           p.nombre as nombre_proveedor,
+                           p.nombre as nombre_proveedor
                     FROM Movimientos_Inventario m
                     INNER JOIN Inventario i ON m.articulo_id = i.articulo_id
                     INNER JOIN Usuarios u ON m.usuario_id = u.usuario_id
@@ -230,7 +230,7 @@ class MovimientoInventario {
                            i.codigo as codigo_articulo,
                            u.nombre as nombre_usuario,
                            u.apellidoPaterno as apellido_usuario,
-                           p.nombre as nombre_proveedor,
+                           p.nombre as nombre_proveedor
                     FROM Movimientos_Inventario m
                     INNER JOIN Inventario i ON m.articulo_id = i.articulo_id
                     INNER JOIN Usuarios u ON m.usuario_id = u.usuario_id
