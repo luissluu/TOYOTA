@@ -371,30 +371,44 @@ const exportarPDFOrden = async (req, res) => {
          .rect(30, 360, 555, 28)
          .fillAndStroke(toyotaRed, toyotaRed);
   
-      doc.text('CANT', 40, 368, { width: 50 })
-         .text('DESCRIPCIÓN DEL SERVICIO', 100, 368, { width: 320 })
-         .text('COSTO', 430, 368, { width: 70 })
-         .text('IMPORTE', 510, 368, { width: 70 });
+      doc.text('CANT', 40, 368, { width: 40, align: 'center' })
+         .text('DESCRIPCIÓN DEL SERVICIO', 90, 368, { width: 270, align: 'left' })
+         .text('COSTO', 370, 368, { width: 80, align: 'right' })
+         .text('IMPORTE', 460, 368, { width: 80, align: 'right' });
   
-      // Contenido de la tabla
       let yPos = 388;
       let total = 0;
   
       detalles.forEach((detalle, i) => {
+        const descripcion = detalle.descripcion_servicio || detalle.nombre_servicio || '';
+        const precio = `$${detalle.precio || detalle.costo || 0}`;
+        const importe = `$${detalle.precio || detalle.costo || 0}`;
+  
+        // Calcula la altura necesaria para la descripción
+        const descHeight = doc.heightOfString(descripcion, { width: 270 });
+        const rowHeight = Math.max(descHeight, 20);
+  
+        // Fondo alterno
         const bgColor = i % 2 === 0 ? '#F5F5F5' : 'white';
-        doc.rect(30, yPos, 555, 28)
-           .fillAndStroke(bgColor, toyotaGray);
-
+        doc.rect(30, yPos, 555, rowHeight).fillAndStroke(bgColor, toyotaGray);
+  
+        // Cantidad
         doc.fontSize(12)
            .fillColor('black')
            .font('Helvetica')
-           .text('1', 40, yPos + 8, { width: 50 })
-           .text(detalle.descripcion_servicio || detalle.nombre_servicio || '', 100, yPos + 8, { width: 320 })
-           .text(`$${detalle.precio || detalle.costo || 0}`, 430, yPos + 8, { width: 70 })
-           .text(`$${detalle.precio || detalle.costo || 0}`, 510, yPos + 8, { width: 70 });
-
+           .text('1', 40, yPos + 4, { width: 40, align: 'center' });
+  
+        // Descripción (con salto de línea)
+        doc.text(descripcion, 90, yPos + 4, { width: 270, align: 'left' });
+  
+        // Costo
+        doc.text(precio, 370, yPos + 4, { width: 80, align: 'right' });
+  
+        // Importe
+        doc.text(importe, 460, yPos + 4, { width: 80, align: 'right' });
+  
         total += Number(detalle.precio || detalle.costo || 0);
-        yPos += 28;
+        yPos += rowHeight;
       });
   
       // Total
@@ -404,8 +418,8 @@ const exportarPDFOrden = async (req, res) => {
       doc.fontSize(14)
          .fillColor('white')
          .font('Helvetica-Bold')
-         .text('TOTAL:', 430, yPos + 8)
-         .text(`$${total.toFixed(2)}`, 510, yPos + 8);
+         .text('TOTAL:', 370, yPos + 8, { width: 80, align: 'right' })
+         .text(`$${total.toFixed(2)}`, 460, yPos + 8, { width: 80, align: 'right' });
   
       // Observaciones
       doc.fontSize(14)
