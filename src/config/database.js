@@ -1,29 +1,40 @@
 const mssql = require("mssql");
 
 const connectionSettings = {
-    server: "woinix.database.windows.net",
-    database: "ToyotaDB",
-    user: "seb07",
-    password: 'ElbichoSiu"',
+    server: process.env.DB_SERVER || "woinix.database.windows.net",
+    database: process.env.DB_NAME || "ToyotaDB",
+    user: process.env.DB_USER || "seb07",
+    password: process.env.DB_PASSWORD || 'ElbichoSiu"',
     options: {
         encrypt: true,
         trustServerCertificate: false,
         enableArithAbort: true,
-        connectionTimeout: 30000
+        connectionTimeout: 30000,
+        pool: {
+            max: 10,
+            min: 0,
+            idleTimeoutMillis: 30000
+        }
     }
 };
 
+let pool = null;
+
 async function getConnection() {
     try {
-        const pool = await mssql.connect(connectionSettings);
+        if (pool) {
+            return pool;
+        }
+        pool = await mssql.connect(connectionSettings);
         console.log('Conexión exitosa a la base de datos');
         return pool;
     } catch (error) {
         console.error('Error de conexión:', error);
+        pool = null;
         throw error;
     }
 }
 
-getConnection();
+// No llamar a getConnection() aquí
 module.exports = { getConnection, mssql };
 

@@ -41,25 +41,27 @@ class OrdenServicio {
     static async findAll() {
         try {
             const pool = await getConnection();
-            const result = await pool.request().query(`
-                SELECT o.*, 
-                       u.nombre as nombre_usuario, 
-                       u.apellidoPaterno as apellido_usuario,
-                       v.marca as marca_vehiculo,
-                       v.modelo as modelo_vehiculo,
-                       v.placa as placa_vehiculo,
-                       v.color as color,
-                       v.kilometraje as kilometraje,
-                       v.anio as anio,
-                       c.fecha as fecha_cita
-                FROM Ordenes_Servicio o
-                INNER JOIN Usuarios u ON o.usuario_id = u.usuario_id
-                INNER JOIN Vehiculos v ON o.vehiculo_id = v.vehiculo_id
-                LEFT JOIN Citas c ON o.cita_id = c.cita_id
-                ORDER BY o.fecha_creacion DESC
-            `);
+            const result = await pool.request()
+                .query(`
+                    SELECT o.*, 
+                           u.nombre as nombre_usuario, 
+                           u.apellidoPaterno as apellido_usuario,
+                           v.marca as marca_vehiculo,
+                           v.modelo as modelo_vehiculo,
+                           v.placa as placa_vehiculo,
+                           v.color as color,
+                           v.kilometraje as kilometraje,
+                           v.anio as anio,
+                           c.fecha as fecha_cita
+                    FROM Ordenes_Servicio o
+                    INNER JOIN Usuarios u ON o.usuario_id = u.usuario_id
+                    INNER JOIN Vehiculos v ON o.vehiculo_id = v.vehiculo_id
+                    LEFT JOIN Citas c ON o.cita_id = c.cita_id
+                    ORDER BY o.fecha_creacion DESC
+                `);
             return result.recordset;
         } catch (error) {
+            console.error('Error en findAll:', error);
             throw error;
         }
     }
