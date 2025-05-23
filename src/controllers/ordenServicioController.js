@@ -258,7 +258,7 @@ const exportarPDFOrden = async (req, res) => {
       const toyotaGray = '#58595B';
   
       // Logo
-      const logoPath = path.join(__dirname, '../../public/Images/Logo.png');
+      const logoPath = path.join(__dirname, '../../src/public/Images/Logo.png');
       try {
         doc.image(logoPath, 50, 50, { width: 120 });
       } catch (e) {
@@ -275,9 +275,9 @@ const exportarPDFOrden = async (req, res) => {
          .fillColor(toyotaGray)
          .text('Toyota Service Center', 200, 90, { align: 'center' });
       
-      doc.fontSize(12)
+         doc.fontSize(12)
          .fillColor('black')
-         .text(`Folio: ${orden.orden_id}`, 450, 60);
+         .text(`Folio: ${orden.orden_id}`, 450, 40); // O prueba con 40, 50, 90, etc.
   
       // Línea decorativa
       doc.moveTo(50, 120)
@@ -368,45 +368,44 @@ const exportarPDFOrden = async (req, res) => {
       doc.fontSize(10)
          .fillColor('white')
          .font('Helvetica-Bold')
-         .rect(50, 360, 495, 20)
+         .rect(30, 360, 555, 28)
          .fillAndStroke(toyotaRed, toyotaRed);
   
-      doc.text('CANT', 60, 365, { width: 40 })
-         .text('DESCRIPCIÓN DEL SERVICIO', 110, 365, { width: 250 })
-         .text('COSTO', 370, 365, { width: 80 })
-         .text('IMPORTE', 450, 365, { width: 80 });
+      doc.text('CANT', 40, 368, { width: 50 })
+         .text('DESCRIPCIÓN DEL SERVICIO', 100, 368, { width: 320 })
+         .text('COSTO', 430, 368, { width: 70 })
+         .text('IMPORTE', 510, 368, { width: 70 });
   
       // Contenido de la tabla
-      let yPos = 380;
+      let yPos = 388;
       let total = 0;
   
       detalles.forEach((detalle, i) => {
         const bgColor = i % 2 === 0 ? '#F5F5F5' : 'white';
-        
-        doc.rect(50, yPos, 495, 20)
+        doc.rect(30, yPos, 555, 28)
            .fillAndStroke(bgColor, toyotaGray);
-  
-        doc.fontSize(10)
+
+        doc.fontSize(12)
            .fillColor('black')
            .font('Helvetica')
-           .text('1', 60, yPos + 5, { width: 40 })
-           .text(detalle.descripcion_servicio || detalle.nombre_servicio || '', 110, yPos + 5, { width: 250 })
-           .text(`$${detalle.precio || detalle.costo || 0}`, 370, yPos + 5, { width: 80 })
-           .text(`$${detalle.precio || detalle.costo || 0}`, 450, yPos + 5, { width: 80 });
-  
+           .text('1', 40, yPos + 8, { width: 50 })
+           .text(detalle.descripcion_servicio || detalle.nombre_servicio || '', 100, yPos + 8, { width: 320 })
+           .text(`$${detalle.precio || detalle.costo || 0}`, 430, yPos + 8, { width: 70 })
+           .text(`$${detalle.precio || detalle.costo || 0}`, 510, yPos + 8, { width: 70 });
+
         total += Number(detalle.precio || detalle.costo || 0);
-        yPos += 20;
+        yPos += 28;
       });
   
       // Total
-      doc.rect(50, yPos, 495, 25)
+      doc.rect(30, yPos, 555, 28)
          .fillAndStroke(toyotaRed, toyotaRed);
   
-      doc.fontSize(12)
+      doc.fontSize(14)
          .fillColor('white')
          .font('Helvetica-Bold')
-         .text('TOTAL:', 370, yPos + 5)
-         .text(`$${total.toFixed(2)}`, 450, yPos + 5);
+         .text('TOTAL:', 430, yPos + 8)
+         .text(`$${total.toFixed(2)}`, 510, yPos + 8);
   
       // Observaciones
       doc.fontSize(14)
@@ -414,30 +413,10 @@ const exportarPDFOrden = async (req, res) => {
          .font('Helvetica-Bold')
          .text('Observaciones', 50, yPos + 40);
   
-      doc.fontSize(10)
+      doc.fontSize(12)
          .fillColor('black')
          .font('Helvetica')
          .text(orden.notas || 'N/A', 50, yPos + 60, { width: 495 });
-  
-      // Firmas
-      const firmaY = yPos + 120;
-      doc.fontSize(10)
-         .fillColor(toyotaGray)
-         .font('Helvetica-Bold')
-         .text('Firma del Prestador del Servicio', 100, firmaY)
-         .text('Firma del Cliente', 350, firmaY);
-  
-      doc.moveTo(100, firmaY + 20)
-         .lineTo(250, firmaY + 20)
-         .strokeColor(toyotaGray)
-         .lineWidth(1)
-         .stroke();
-  
-      doc.moveTo(350, firmaY + 20)
-         .lineTo(500, firmaY + 20)
-         .strokeColor(toyotaGray)
-         .lineWidth(1)
-         .stroke();
   
       // Pie de página
       doc.fontSize(9)
