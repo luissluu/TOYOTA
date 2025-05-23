@@ -106,8 +106,10 @@ const getMovimientosByFecha = async (req, res) => {
 };
 
 // Crear un nuevo movimiento
+// Crear un nuevo movimiento
 const createMovimiento = async (req, res) => {
     try {
+        console.log('Datos recibidos en createMovimiento:', req.body);
         const movimiento = await MovimientoInventario.create(req.body);
         res.status(201).json(movimiento);
     } catch (error) {
@@ -153,7 +155,11 @@ const deleteMovimiento = async (req, res) => {
     }
 };
 
+
+
 module.exports = {
+
+    
     getAllMovimientos,
     getMovimientoById,
     getMovimientosByArticulo,
