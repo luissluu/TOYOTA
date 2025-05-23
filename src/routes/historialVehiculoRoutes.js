@@ -11,8 +11,7 @@ const {
     updateHistorial,
     deleteHistorial,
     exportarPDF,
-    exportarExcel,
-    deleteHistorial
+    exportarExcel
 } = require('../controllers/historialVehiculoController');
 
 // Obtener todo el historial
