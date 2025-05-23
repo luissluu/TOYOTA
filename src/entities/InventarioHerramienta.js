@@ -9,11 +9,9 @@ class InventarioHerramienta {
                 .input('tipo', mssql.NVarChar(50), herramienta.tipo)
                 .input('estado', mssql.NVarChar(50), herramienta.estado)
                 .input('cantidad', mssql.Int, herramienta.cantidad)
-                .input('fecha_salida', mssql.Date, herramienta.fecha_salida || null)
-                .input('fecha_regreso', mssql.Date, herramienta.fecha_regreso || null)
                 .query(`
-                    INSERT INTO Inventario_Herramientas (nombre, tipo, estado, cantidad, fecha_salida, fecha_regreso)
-                    VALUES (@nombre, @tipo, @estado, @cantidad, @fecha_salida, @fecha_regreso);
+                    INSERT INTO Inventario_Herramientas (nombre, tipo, estado, cantidad)
+                    VALUES (@nombre, @tipo, @estado, @cantidad);
                     SELECT SCOPE_IDENTITY() AS id;
                 `);
             const id = result.recordset[0].id;
@@ -54,16 +52,12 @@ class InventarioHerramienta {
                 .input('tipo', mssql.NVarChar(50), herramienta.tipo)
                 .input('estado', mssql.NVarChar(50), herramienta.estado)
                 .input('cantidad', mssql.Int, herramienta.cantidad)
-                .input('fecha_salida', mssql.Date, herramienta.fecha_salida || null)
-                .input('fecha_regreso', mssql.Date, herramienta.fecha_regreso || null)
                 .query(`
                     UPDATE Inventario_Herramientas
                     SET nombre = @nombre,
                         tipo = @tipo,
                         estado = @estado,
-                        cantidad = @cantidad,
-                        fecha_salida = @fecha_salida,
-                        fecha_regreso = @fecha_regreso
+                        cantidad = @cantidad
                     OUTPUT INSERTED.*
                     WHERE id = @id
                 `);
