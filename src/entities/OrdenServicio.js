@@ -51,7 +51,7 @@ class OrdenServicio {
                            v.placa as placa_vehiculo,
                            v.color as color,
                            v.kilometraje as kilometraje,
-                           v.anio as anio,
+                             v.año as anio,
                            c.fecha as fecha_cita
                     FROM Ordenes_Servicio o
                     INNER JOIN Usuarios u ON o.usuario_id = u.usuario_id
@@ -80,7 +80,7 @@ class OrdenServicio {
                            v.placa as placa_vehiculo,
                            v.color as color,
                            v.kilometraje as kilometraje,
-                           v.anio as anio,
+                             v.año as anio,
                            c.fecha as fecha_cita
                     FROM Ordenes_Servicio o
                     INNER JOIN Usuarios u ON o.usuario_id = u.usuario_id
@@ -108,7 +108,7 @@ class OrdenServicio {
                            v.placa as placa_vehiculo,
                            v.color as color,
                            v.kilometraje as kilometraje,
-                           v.anio as anio,
+                             v.año as anio,
                            c.fecha as fecha_cita
                     FROM Ordenes_Servicio o
                     INNER JOIN Usuarios u ON o.usuario_id = u.usuario_id
@@ -137,7 +137,7 @@ class OrdenServicio {
                            v.placa as placa_vehiculo,
                            v.color as color,
                            v.kilometraje as kilometraje,
-                           v.anio as anio,
+                            v.año as anio,
                            c.fecha as fecha_cita
                     FROM Ordenes_Servicio o
                     INNER JOIN Usuarios u ON o.usuario_id = u.usuario_id
@@ -166,7 +166,7 @@ class OrdenServicio {
                            v.placa as placa_vehiculo,
                            v.color as color,
                            v.kilometraje as kilometraje,
-                           v.anio as anio,
+                             v.año as anio,
                            c.fecha as fecha_cita
                     FROM Ordenes_Servicio o
                     INNER JOIN Usuarios u ON o.usuario_id = u.usuario_id
