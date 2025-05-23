@@ -14,104 +14,6 @@ const getAllOrdenes = async (req, res) => {
         res.status(500).json({ error: 'Error al obtener las órdenes de servicio' });
     }
 };
-// Exportar PDF de una orden de servicio
-const exportarPDFOrden = async (req, res) => {
-    try {
-      const { id } = req.params;
-      const orden = await OrdenServicio.findById(id);
-      if (!orden) {
-        return res.status(404).json({ error: 'Orden de servicio no encontrada' });
-      }
-      // Obtener detalles de la orden
-      const detalles = await DetalleOrden.findByOrden(id);
-  
-      // Crear el PDF
-      const doc = new PDFDocument({ margin: 40, size: 'A4' });
-      res.setHeader('Content-Type', 'application/pdf');
-      res.setHeader('Content-Disposition', `attachment; filename=orden-servicio-${id}.pdf`);
-      doc.pipe(res);
-  
-      // Logo
-      const logoPath = path.join(__dirname, '../../public/Images/Logo.png');
-      try {
-        doc.image(logoPath, 40, 30, { width: 90 });
-      } catch (e) {
-        // Si no se encuentra el logo, continuar sin error
-      }
-  
-      // Encabezado
-      doc.fontSize(18).font('Helvetica-Bold').text('Orden de Servicio', 150, 40, { align: 'center' });
-      doc.fontSize(12).font('Helvetica').text('Taller Mecánico', 150, 65, { align: 'center' });
-      doc.fontSize(10).text(`Folio: ${orden.orden_id}`, 450, 40);
-      doc.moveDown(2);
-  
-      // Datos del vehículo y cliente
-      doc.fontSize(12).font('Helvetica-Bold').text('Datos del Vehículo', 40, 110);
-      doc.fontSize(10).font('Helvetica').text(`Marca: ${orden.marca_vehiculo || ''}`, 40, 130);
-      doc.text(`Modelo: ${orden.modelo_vehiculo || ''}`, 200, 130);
-      doc.text(`Placa: ${orden.placa_vehiculo || ''}`, 360, 130);
-      doc.text(`Color: ${orden.color || ''}`, 40, 145);
-      doc.text(`Kilometraje: ${orden.kilometraje || ''}`, 200, 145);
-      doc.text(`Año: ${orden.anio || ''}`, 360, 145);
-      doc.moveDown();
-      doc.font('Helvetica-Bold').text('Datos del Cliente', 40, 170);
-      doc.font('Helvetica').fontSize(10).text(`Nombre: ${orden.nombre_usuario || ''} ${orden.apellido_usuario || ''}`, 40, 190);
-      doc.text(`Teléfono: ${orden.telefono || ''}`, 300, 190);
-      doc.text(`Email: ${orden.email || ''}`, 40, 205);
-      doc.moveDown(2);
-  
-      // Fechas
-      doc.font('Helvetica-Bold').text('Ingreso:', 40, 230);
-      doc.font('Helvetica').text(orden.fecha_inicio ? new Date(orden.fecha_inicio).toLocaleDateString() : '', 100, 230);
-      doc.font('Helvetica-Bold').text('Salida:', 200, 230);
-      doc.font('Helvetica').text(orden.fecha_finalizacion ? new Date(orden.fecha_finalizacion).toLocaleDateString() : '', 250, 230);
-      doc.moveDown(2);
-  
-      // Tabla de servicios
-      doc.font('Helvetica-Bold').fontSize(12).text('Trabajos Realizados', 40, 260);
-      doc.moveTo(40, 275).lineTo(550, 275).stroke();
-      doc.fontSize(10).font('Helvetica-Bold');
-      doc.text('CANT', 40, 280, { width: 40 });
-      doc.text('DESCRIPCIÓN DEL TRABAJO', 90, 280, { width: 250 });
-      doc.text('COSTO', 350, 280, { width: 80 });
-      doc.text('IMPORTE', 430, 280, { width: 80 });
-      doc.moveTo(40, 295).lineTo(550, 295).stroke();
-      doc.font('Helvetica').fontSize(10);
-      let y = 300;
-      let total = 0;
-      detalles.forEach((detalle, i) => {
-        doc.text('1', 40, y, { width: 40 });
-        doc.text(detalle.descripcion_servicio || detalle.nombre_servicio || '', 90, y, { width: 250 });
-        doc.text(`$${detalle.precio || detalle.costo || 0}`, 350, y, { width: 80 });
-        doc.text(`$${detalle.precio || detalle.costo || 0}`, 430, y, { width: 80 });
-        total += Number(detalle.precio || detalle.costo || 0);
-        y += 18;
-      });
-      doc.moveTo(40, y).lineTo(550, y).stroke();
-      doc.font('Helvetica-Bold').text('TOTAL:', 350, y + 5);
-      doc.font('Helvetica').text(`$${total}`, 430, y + 5);
-      y += 30;
-  
-      // Observaciones
-      doc.font('Helvetica-Bold').fontSize(12).text('Observaciones', 40, y);
-      doc.font('Helvetica').fontSize(10).text(orden.notas || 'N/A', 40, y + 18, { width: 500 });
-      y += 50;
-  
-      // Firmas
-      doc.font('Helvetica-Bold').fontSize(10).text('Firma del Prestador del Servicio', 60, y + 40);
-      doc.font('Helvetica-Bold').fontSize(10).text('Firma del Consumidor', 350, y + 40);
-      doc.moveTo(60, y + 70).lineTo(220, y + 70).stroke();
-      doc.moveTo(350, y + 70).lineTo(510, y + 70).stroke();
-  
-      // Pie de página
-      doc.font('Helvetica').fontSize(9).text('Av. Reforma #1234, Col. Juárez, Ciudad de México, C.P. 06600. Tel: 554412457812', 40, 780, { align: 'center', width: 520 });
-      doc.end();
-    } catch (error) {
-      console.error('Error al generar PDF de la orden:', error);
-      res.status(500).json({ error: 'Error al generar el PDF de la orden' });
-    }
-  };
-  
 
 // Obtener una orden por ID
 const getOrdenById = async (req, res) => {
@@ -325,6 +227,231 @@ const finalizarOrden = async (req, res) => {
         res.status(500).json({ error: 'Error al finalizar la orden' });
     }
 };
+
+// Exportar PDF de una orden de servicio
+const exportarPDFOrden = async (req, res) => {
+    try {
+      const { id } = req.params;
+      const orden = await OrdenServicio.findById(id);
+      if (!orden) {
+        return res.status(404).json({ error: 'Orden de servicio no encontrada' });
+      }
+      const detalles = await DetalleOrden.findByOrden(id);
+  
+      // Crear el PDF con márgenes ajustados
+      const doc = new PDFDocument({ 
+        margin: 50,
+        size: 'A4',
+        info: {
+          Title: `Orden de Servicio #${id}`,
+          Author: 'Toyota Service Center'
+        }
+      });
+  
+      // Configurar headers para la descarga
+      res.setHeader('Content-Type', 'application/pdf');
+      res.setHeader('Content-Disposition', `attachment; filename=orden-servicio-${id}.pdf`);
+      doc.pipe(res);
+  
+      // Colores Toyota
+      const toyotaRed = '#EB0A1E';
+      const toyotaGray = '#58595B';
+  
+      // Logo
+      const logoPath = path.join(__dirname, '../../public/Images/Logo.png');
+      try {
+        doc.image(logoPath, 50, 50, { width: 120 });
+      } catch (e) {
+        console.log('Logo no encontrado:', e);
+      }
+  
+      // Encabezado con estilo Toyota
+      doc.fontSize(24)
+         .font('Helvetica-Bold')
+         .fillColor(toyotaRed)
+         .text('Orden de Servicio', 200, 60, { align: 'center' });
+      
+      doc.fontSize(14)
+         .fillColor(toyotaGray)
+         .text('Toyota Service Center', 200, 90, { align: 'center' });
+      
+      doc.fontSize(12)
+         .fillColor('black')
+         .text(`Folio: ${orden.orden_id}`, 450, 60);
+  
+      // Línea decorativa
+      doc.moveTo(50, 120)
+         .lineTo(545, 120)
+         .strokeColor(toyotaRed)
+         .lineWidth(2)
+         .stroke();
+  
+      // Datos del vehículo
+      doc.fontSize(14)
+         .fillColor(toyotaRed)
+         .font('Helvetica-Bold')
+         .text('Datos del Vehículo', 50, 140);
+  
+      // Tabla de datos del vehículo
+      const vehiculoData = [
+        ['Marca:', orden.marca_vehiculo || ''],
+        ['Modelo:', orden.modelo_vehiculo || ''],
+        ['Placa:', orden.placa_vehiculo || ''],
+        ['Color:', orden.color || ''],
+        ['Kilometraje:', orden.kilometraje || ''],
+        ['Año:', orden.anio || '']
+      ];
+  
+      let y = 160;
+      vehiculoData.forEach(([label, value]) => {
+        doc.fontSize(10)
+           .fillColor(toyotaGray)
+           .font('Helvetica-Bold')
+           .text(label, 50, y)
+           .fillColor('black')
+           .font('Helvetica')
+           .text(value, 150, y);
+        y += 20;
+      });
+  
+      // Datos del cliente
+      doc.fontSize(14)
+         .fillColor(toyotaRed)
+         .font('Helvetica-Bold')
+         .text('Datos del Cliente', 300, 140);
+  
+      const clienteData = [
+        ['Nombre:', `${orden.nombre_usuario || ''} ${orden.apellido_usuario || ''}`],
+        ['Teléfono:', orden.telefono || ''],
+        ['Email:', orden.email || '']
+      ];
+  
+      y = 160;
+      clienteData.forEach(([label, value]) => {
+        doc.fontSize(10)
+           .fillColor(toyotaGray)
+           .font('Helvetica-Bold')
+           .text(label, 300, y)
+           .fillColor('black')
+           .font('Helvetica')
+           .text(value, 380, y);
+        y += 20;
+      });
+  
+      // Fechas
+      doc.fontSize(14)
+         .fillColor(toyotaRed)
+         .font('Helvetica-Bold')
+         .text('Fechas del Servicio', 50, 280);
+  
+      doc.fontSize(10)
+         .fillColor(toyotaGray)
+         .font('Helvetica-Bold')
+         .text('Ingreso:', 50, 300)
+         .fillColor('black')
+         .font('Helvetica')
+         .text(orden.fecha_inicio ? new Date(orden.fecha_inicio).toLocaleDateString() : '', 120, 300)
+         .fillColor(toyotaGray)
+         .font('Helvetica-Bold')
+         .text('Salida:', 250, 300)
+         .fillColor('black')
+         .font('Helvetica')
+         .text(orden.fecha_finalizacion ? new Date(orden.fecha_finalizacion).toLocaleDateString() : '', 320, 300);
+  
+      // Tabla de servicios
+      doc.fontSize(14)
+         .fillColor(toyotaRed)
+         .font('Helvetica-Bold')
+         .text('Servicios Realizados', 50, 340);
+  
+      // Encabezado de la tabla
+      doc.fontSize(10)
+         .fillColor('white')
+         .font('Helvetica-Bold')
+         .rect(50, 360, 495, 20)
+         .fillAndStroke(toyotaRed, toyotaRed);
+  
+      doc.text('CANT', 60, 365, { width: 40 })
+         .text('DESCRIPCIÓN DEL SERVICIO', 110, 365, { width: 250 })
+         .text('COSTO', 370, 365, { width: 80 })
+         .text('IMPORTE', 450, 365, { width: 80 });
+  
+      // Contenido de la tabla
+      let yPos = 380;
+      let total = 0;
+  
+      detalles.forEach((detalle, i) => {
+        const bgColor = i % 2 === 0 ? '#F5F5F5' : 'white';
+        
+        doc.rect(50, yPos, 495, 20)
+           .fillAndStroke(bgColor, toyotaGray);
+  
+        doc.fontSize(10)
+           .fillColor('black')
+           .font('Helvetica')
+           .text('1', 60, yPos + 5, { width: 40 })
+           .text(detalle.descripcion_servicio || detalle.nombre_servicio || '', 110, yPos + 5, { width: 250 })
+           .text(`$${detalle.precio || detalle.costo || 0}`, 370, yPos + 5, { width: 80 })
+           .text(`$${detalle.precio || detalle.costo || 0}`, 450, yPos + 5, { width: 80 });
+  
+        total += Number(detalle.precio || detalle.costo || 0);
+        yPos += 20;
+      });
+  
+      // Total
+      doc.rect(50, yPos, 495, 25)
+         .fillAndStroke(toyotaRed, toyotaRed);
+  
+      doc.fontSize(12)
+         .fillColor('white')
+         .font('Helvetica-Bold')
+         .text('TOTAL:', 370, yPos + 5)
+         .text(`$${total.toFixed(2)}`, 450, yPos + 5);
+  
+      // Observaciones
+      doc.fontSize(14)
+         .fillColor(toyotaRed)
+         .font('Helvetica-Bold')
+         .text('Observaciones', 50, yPos + 40);
+  
+      doc.fontSize(10)
+         .fillColor('black')
+         .font('Helvetica')
+         .text(orden.notas || 'N/A', 50, yPos + 60, { width: 495 });
+  
+      // Firmas
+      const firmaY = yPos + 120;
+      doc.fontSize(10)
+         .fillColor(toyotaGray)
+         .font('Helvetica-Bold')
+         .text('Firma del Prestador del Servicio', 100, firmaY)
+         .text('Firma del Cliente', 350, firmaY);
+  
+      doc.moveTo(100, firmaY + 20)
+         .lineTo(250, firmaY + 20)
+         .strokeColor(toyotaGray)
+         .lineWidth(1)
+         .stroke();
+  
+      doc.moveTo(350, firmaY + 20)
+         .lineTo(500, firmaY + 20)
+         .strokeColor(toyotaGray)
+         .lineWidth(1)
+         .stroke();
+  
+      // Pie de página
+      doc.fontSize(9)
+         .fillColor(toyotaGray)
+         .font('Helvetica')
+         .text('Toyota Service Center - Av. Reforma #1234, Col. Juárez, Ciudad de México, C.P. 06600', 50, 780, { align: 'center', width: 495 })
+         .text('Tel: 554412457812 | www.toyota.com.mx', 50, 795, { align: 'center', width: 495 });
+  
+      doc.end();
+    } catch (error) {
+      console.error('Error al generar PDF de la orden:', error);
+      res.status(500).json({ error: 'Error al generar el PDF de la orden' });
+    }
+  };
 
 module.exports = {
     getAllOrdenes,
